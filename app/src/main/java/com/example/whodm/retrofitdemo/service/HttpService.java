@@ -2,6 +2,10 @@ package com.example.whodm.retrofitdemo.service;
 
 import android.util.Log;
 
+import com.example.whodm.retrofitdemo.callback.BannerCallback;
+import com.example.whodm.retrofitdemo.callback.ClassesCallback;
+import com.example.whodm.retrofitdemo.callback.IndexCallback;
+import com.example.whodm.retrofitdemo.callback.SingleCallback;
 import com.example.whodm.retrofitdemo.model.all.AllData;
 import com.example.whodm.retrofitdemo.model.banners.BannerData;
 import com.example.whodm.retrofitdemo.model.banners.Banners;
@@ -19,6 +23,7 @@ import com.example.whodm.retrofitdemo.model.topicdetail.TopicDetailData;
 import com.example.whodm.retrofitdemo.request.API;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import retrofit.Call;
 import retrofit.Callback;
@@ -32,6 +37,7 @@ import retrofit.Retrofit;
 public class HttpService {
     private Retrofit retrofit;
     private API api;
+    private List<Banners> bannersList;
     public HttpService() {
         retrofit = new Retrofit.Builder()
                 .baseUrl("http://api.dantangapp.com/")
@@ -82,7 +88,7 @@ public class HttpService {
         });
     }
     //底部 风格，品类
-    public void bottomStyleService(){
+    public void bottomStyleService(final ClassesCallback callback) {
         Call<BaseModel<BottomStyleData>> call = api.defaultChannel_Group();
 
         call.enqueue(new Callback<BaseModel<BottomStyleData>>() {
@@ -90,15 +96,16 @@ public class HttpService {
             public void onResponse(Response<BaseModel<BottomStyleData>> response, Retrofit retrofit) {
                 if (response.body().data == null || response.body().data.channel_groups.size() == 0) {
                     Log.d("onRespone bottomStyle","Null");
-
+                    callback.onClassesFail();
                 } else {
                     Log.d("onRespone bottomStyle",response.body().data.channel_groups.toString());
+                    callback.onClassesSuccess(response.body().data);
                 }
             }
 
             @Override
             public void onFailure(Throwable t) {
-
+                callback.onClassesFail();
             }
         });
     }
@@ -124,8 +131,9 @@ public class HttpService {
         });
     }
     //专题合集 -> 专题列表数据
-    public void topicService(int i){
-        Call<BaseModel<TopicData>> call = api.defaultTopic(i);
+    //通过获取id得到专题列表
+    public void topicService(int id, int offset) {
+        Call<BaseModel<TopicData>> call = api.defaultTopic(id, offset);
 
         call.enqueue(new Callback<BaseModel<TopicData>>() {
             @Override
@@ -145,23 +153,24 @@ public class HttpService {
         });
     }
     //单品接口
-    public void singleService(int i){
-        Call<BaseModel<SingleData>> call = api.defaultSingleItem(i);
+    public void singleService(int offset, final SingleCallback callback) {
+        Call<BaseModel<SingleData>> call = api.defaultSingleItem(offset);
 
         call.enqueue(new Callback<BaseModel<SingleData>>() {
             @Override
             public void onResponse(Response<BaseModel<SingleData>> response, Retrofit retrofit) {
                 if (response.body().data == null || response.body().data.items.size() == 0) {
                     Log.d("onRespone single","Null");
-
+                    callback.onSingleFail();
                 } else {
                     Log.d("onRespone single",response.body().data.items.toString());
+                    callback.onSingleSuccess(response.body().data);
                 }
             }
 
             @Override
             public void onFailure(Throwable t) {
-
+                callback.onSingleFail();
             }
         });
     }
@@ -229,45 +238,47 @@ public class HttpService {
         });
     }
     //首页数据 GET
-    public void indexService(int index){
-        Call<BaseModel<IndexData<ArrayList<Item>>>> call = api.defaultIndex(0);
+    public void indexService(int id, int offset, final IndexCallback callback) {
+        final Call<BaseModel<IndexData<ArrayList<Item>>>> call = api.defaultIndex(id, offset);
 
         call.enqueue(new Callback<BaseModel<IndexData<ArrayList<Item>>>>() {
             @Override
             public void onResponse(Response<BaseModel<IndexData<ArrayList<Item>>>> response, Retrofit retrofit) {
                 if (response.body().data.items == null || response.body().data.items.size() == 0) {
                     Log.d("onRespone index",response.body().data.items+"");
-
+                    callback.onIndexFail();
                 } else {
                     Log.d("onRespone index",response.body().data.items.get(1).content_url);
+                    callback.onIndexSuccess(response.body().data.items);
                 }
             }
 
             @Override
             public void onFailure(Throwable t) {
-
+                callback.onIndexFail();
             }
         });
     }
     //头部旋转视图数据
-    public void bannerService(){
+    public void bannerService(final BannerCallback callback) {
         Call<BaseModel<BannerData<ArrayList<Banners>>>> call = api.defaultBanner();
-
         call.enqueue(new Callback<BaseModel<BannerData<ArrayList<Banners>>>>() {
             @Override
             public void onResponse(Response<BaseModel<BannerData<ArrayList<Banners>>>> response, Retrofit retrofit) {
                 if (response.body().data.banners == null || response.body().data.banners.size() == 0) {
-                    Log.d("onRespone banner","run");
-
+                    Log.d("onRespone banner", "nothing in here");
+                    callback.onBannerFail();
                 } else {
-                    Log.d("onRespone banner",response.body().data.banners.toString());
+                    Log.d("onRespone banner", response.body().data.banners.get(0).getImage_url());
+                    callback.onBannerSuccess(response.body().data.banners);
                 }
             }
 
             @Override
             public void onFailure(Throwable t) {
-
+                callback.onBannerFail();
             }
         });
     }
+
 }

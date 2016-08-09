@@ -6,4 +6,20 @@ package com.example.whodm.retrofitdemo.model.index;
 public class IndexData<T> {
     public T items;
     public Paging paging;
+
+    public T getItems() {
+        return items;
+    }
+
+    public void setItems(T items) {
+        this.items = items;
+    }
+
+    public Paging getPaging() {
+        return paging;
+    }
+
+    public void setPaging(Paging paging) {
+        this.paging = paging;
+    }
 }

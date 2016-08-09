@@ -5,4 +5,12 @@ package com.example.whodm.retrofitdemo.model.banners;
  */
 public class BannerData<T> {
     public T banners;
+
+    public T getBanners() {
+        return banners;
+    }
+
+    public void setBanners(T banners) {
+        this.banners = banners;
+    }
 }

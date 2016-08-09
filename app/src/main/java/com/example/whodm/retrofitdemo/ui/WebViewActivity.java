@@ -49,10 +49,10 @@ public class WebViewActivity extends AppCompatActivity {
                 finish();
             }
         });
-        /**
-         * 设置WebView的属性，此时可以去执行JavaScript脚本
-         */
-        webView.getSettings().setJavaScriptEnabled(true);
+//        /**
+//         * 设置WebView的属性，此时可以去执行JavaScript脚本
+//         */
+//        webView.getSettings().setJavaScriptEnabled(true);
     }
 
     Handler handler = new Handler(){

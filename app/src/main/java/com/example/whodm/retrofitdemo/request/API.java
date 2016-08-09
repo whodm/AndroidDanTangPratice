@@ -19,6 +19,7 @@ import java.util.ArrayList;
 
 import retrofit.Call;
 import retrofit.http.GET;
+import retrofit.http.Path;
 import retrofit.http.Query;
 
 /**
@@ -30,8 +31,9 @@ public interface API {
     Call<BaseModel<BannerData<ArrayList<Banners>>>> defaultBanner();
 
     //首页数据 GET
-    @GET("v1/channels/4/items?gender=1&generation=1&limit=20")
+    @GET("v1/channels/{id}/items?gender=1&generation=1&limit=20")
     Call<BaseModel<IndexData<ArrayList<Item>>>> defaultIndex(
+            @Path("id") int id,
             @Query("offset") int pageOffset
     );
 
@@ -62,8 +64,9 @@ public interface API {
     );
 
     //专题合集 -> 专题列表数据
-    @GET("v1/collections/4/posts?gender=1&generation=1&limit=20")
+    @GET("v1/collections/{id}/posts?gender=1&generation=1&limit=20")
     Call<BaseModel<TopicData>> defaultTopic(
+            @Path("id") int id,
             @Query("offset") int pageOffset
     );
 

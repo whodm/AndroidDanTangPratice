@@ -8,4 +8,12 @@ import java.util.List;
  */
 public class BottomStyleData {
     public List<ChannelGroup> channel_groups = new ArrayList<ChannelGroup>();
+
+    public List<ChannelGroup> getChannel_groups() {
+        return channel_groups;
+    }
+
+    public void setChannel_groups(List<ChannelGroup> channel_groups) {
+        this.channel_groups = channel_groups;
+    }
 }

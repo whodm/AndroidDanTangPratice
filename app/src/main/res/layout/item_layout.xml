@@ -9,6 +9,7 @@
         android:layout_height="match_parent">
 
         <ImageView
+            android:id="@+id/iv_cover"
             android:src="@drawable/probe"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
@@ -32,7 +33,7 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="Like"
-            android:id="@+id/textView4"
+            android:id="@+id/tv_like"
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
             android:textColor="#ffffff" />

@@ -9,4 +9,20 @@ import java.util.List;
 public class AllData {
     public List<Collection> collections = new ArrayList<Collection>();
     public Paging paging;
+
+    public List<Collection> getCollections() {
+        return collections;
+    }
+
+    public void setCollections(List<Collection> collections) {
+        this.collections = collections;
+    }
+
+    public Paging getPaging() {
+        return paging;
+    }
+
+    public void setPaging(Paging paging) {
+        this.paging = paging;
+    }
 }

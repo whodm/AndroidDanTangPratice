@@ -24,4 +24,12 @@ public class Item {
     public String type;
     public Integer updated_at;
     public String url;
+
+    public String getContent_url() {
+        return content_url;
+    }
+
+    public void setContent_url(String content_url) {
+        this.content_url = content_url;
+    }
 }

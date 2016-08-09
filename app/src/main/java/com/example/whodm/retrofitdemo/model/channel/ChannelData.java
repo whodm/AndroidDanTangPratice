@@ -9,4 +9,20 @@ import java.util.List;
 public class ChannelData {
     public List<Item> items = new ArrayList<Item>();
     public Paging paging;
+
+    public List<Item> getItems() {
+        return items;
+    }
+
+    public void setItems(List<Item> items) {
+        this.items = items;
+    }
+
+    public Paging getPaging() {
+        return paging;
+    }
+
+    public void setPaging(Paging paging) {
+        this.paging = paging;
+    }
 }

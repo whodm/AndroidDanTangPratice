@@ -16,6 +16,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 
+import com.bumptech.glide.Glide;
 import com.example.whodm.retrofitdemo.R;
 
 import java.util.ArrayList;
@@ -29,13 +30,13 @@ import java.util.concurrent.TimeUnit;
  */
 public class LoopView extends FrameLayout {
     //轮播图图片数量
-    private final static int IMAGE_COUNT = 7;
+    private final static int IMAGE_COUNT = 3;
     //自动轮播时间间隔
-    private final static int TIME_INTERVAL = 3;
+    private final static int TIME_INTERVAL = 5;
     //自动轮播启用开关
     private final static boolean isAutoPlay = true;
     //ImageView资源ID
-    private int[] imageResIds;
+    private List<String> imageUrl;
     private List<ImageView> imageViewList;
     private List<View> dotViewList;
     private ViewPager viewPager;
@@ -51,23 +52,29 @@ public class LoopView extends FrameLayout {
         }
     };
 
-    public LoopView(Context context) {
+    public LoopView(Context context, List<String> list) {
         super(context);
-    }
-
-    public LoopView(Context context, AttributeSet attributeSet) {
-        this(context, attributeSet, 0);
-    }
-
-    public LoopView(Context context, AttributeSet attributeSet, int defStyle) {
-        super(context, attributeSet, defStyle);
+        this.imageUrl = list;
         initImageView();
         initUI(context);
         if (isAutoPlay) {
             startPlay();
         }
-
     }
+
+//    public LoopView(Context context, AttributeSet attributeSet) {
+//        this(context, attributeSet, 0);
+//    }
+//
+//    public LoopView(Context context, AttributeSet attributeSet, int defStyle) {
+//        super(context, attributeSet, defStyle);
+//        initImageView();
+//        initUI(context);
+//        if (isAutoPlay) {
+//            startPlay();
+//        }
+//
+//    }
 
     /**
      * 开始轮播图切换
@@ -92,9 +99,10 @@ public class LoopView extends FrameLayout {
      */
     private void initUI(Context context) {
         LayoutInflater.from(context).inflate(R.layout.load_view, this, true);
-        for (int imagesID : imageResIds) {
+        for (String imagesID : imageUrl) {
             ImageView view = new ImageView(context);
-            view.setImageResource(imagesID);
+//            view.setImageResource(imagesID);
+            Glide.with(getContext()).load(imagesID).into(view);
             view.setScaleType(ImageView.ScaleType.FIT_XY);
             imageViewList.add(view);
         }
@@ -109,14 +117,15 @@ public class LoopView extends FrameLayout {
     }
 
     private void initImageView() {
-        imageResIds = new int[]{
-                R.drawable.probe,
-                R.drawable.probe,
-                R.drawable.probe,
-        };
+//        imageResIds = new int[]{
+//                R.drawable.probe,
+//                R.drawable.probe,
+//                R.drawable.probe,
+//        };
         imageViewList = new ArrayList<>();
         dotViewList = new ArrayList<>();
     }
+
 
     private class MyPagerAdapter extends PagerAdapter {
         @Override

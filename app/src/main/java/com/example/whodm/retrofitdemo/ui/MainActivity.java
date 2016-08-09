@@ -1,7 +1,9 @@
 package com.example.whodm.retrofitdemo.ui;
 
 import android.content.Intent;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.util.TypedValue;
@@ -12,19 +14,25 @@ import android.widget.TextView;
 import com.astuetz.PagerSlidingTabStrip;
 import com.example.whodm.retrofitdemo.R;
 import com.example.whodm.retrofitdemo.service.HttpService;
-import com.example.whodm.retrofitdemo.ui.Adapter.PagerAdapter;
+import com.example.whodm.retrofitdemo.ui.Adapter.IndexPagerAdapter;
+import com.example.whodm.retrofitdemo.ui.Adapter.MainPagerAdapter;
+import com.example.whodm.retrofitdemo.ui.Fragment.ClassesFragment;
+import com.example.whodm.retrofitdemo.ui.Fragment.IndexFragment;
+import com.example.whodm.retrofitdemo.ui.Fragment.SingleFragment;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends FragmentActivity {
-    private HttpService httpService;
     private LinearLayout ll_Index;
     private LinearLayout ll_Single;
     private LinearLayout ll_Class;
-    private PagerAdapter pagerAdapter;
+    //viewPage
     private ViewPager viewPager;
-    private PagerSlidingTabStrip pagerSlidingTabStrip;
+    private MainPagerAdapter mainPagerAdapter;
+
     private TextView tv_search;
-    //当前页面
-    private int currentIndex;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,18 +48,35 @@ public class MainActivity extends FragmentActivity {
                 startActivity(intent);
             }
         });
-        pagerAdapter = new PagerAdapter(getSupportFragmentManager());
-        viewPager.setAdapter(pagerAdapter);
-        final int pageMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, getResources()
-                .getDisplayMetrics());
-        viewPager.setPageMargin(pageMargin);
-        pagerSlidingTabStrip.setViewPager(viewPager);
+        mainPagerAdapter = new MainPagerAdapter(getSupportFragmentManager());
+        viewPager.setAdapter(mainPagerAdapter);
+        viewPager.setCurrentItem(0);
+        viewPager.setOffscreenPageLimit(2);
+        ll_Index.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewPager.setCurrentItem(0);
+            }
+        });
+        ll_Single.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewPager.setCurrentItem(1);
+            }
+        });
+        ll_Class.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewPager.setCurrentItem(2);
+            }
+        });
 
     }
     public void findIdBy(){
-        pagerSlidingTabStrip = (PagerSlidingTabStrip)findViewById(R.id.tabs);
-        viewPager = (ViewPager)findViewById(R.id.vp);
         tv_search = (TextView)findViewById(R.id.tv_search);
         ll_Index = (LinearLayout)findViewById(R.id.id_tab_index);
+        ll_Single = (LinearLayout) findViewById(R.id.id_tab_single);
+        ll_Class = (LinearLayout) findViewById(R.id.id_tab_class);
+        viewPager = (ViewPager) findViewById(R.id.id_page_vp);
     }
 }

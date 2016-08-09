@@ -10,10 +10,11 @@ import com.example.whodm.retrofitdemo.ui.Fragment.OtherFragment;
 /**
  * Created by X on 2016/8/8.
  */
-public class PagerAdapter extends FragmentPagerAdapter{
+public class IndexPagerAdapter extends FragmentPagerAdapter {
     private final String[] Titles = {"精选","美食","家居","数码","美食","杂货"};
     private CollectionFragment collectionFragment;
-    public PagerAdapter(FragmentManager fm) {
+
+    public IndexPagerAdapter(FragmentManager fm) {
         super(fm);
         collectionFragment = new CollectionFragment();
     }
