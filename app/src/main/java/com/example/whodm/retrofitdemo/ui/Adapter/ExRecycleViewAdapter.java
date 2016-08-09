@@ -28,9 +28,9 @@ public class ExRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.View
     //footers
     List<View> footers = new ArrayList<>();
 
-    private Context context;
+    private ItemViewHolder itemViewHolder;
 
-    private ItemCover itemCover;
+    private Context context;
 
     public static final int TYPE_HEADER = 111;
     public static final int TYPE_FOOTER = 222;
@@ -40,11 +40,14 @@ public class ExRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     private OnItemClickListener onItemClickListener;
 
-    public ExRecycleViewAdapter(List<ItemCover> items, List<View> headers, Context context) {
+    public ExRecycleViewAdapter(List<ItemCover> items, Context context) {
         this.items = items;
-        this.headers = headers;
         this.context = context;
     }
+
+    //    public ExRecycleViewAdapter(Context context) {
+//        this.context = context;
+//    }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -54,7 +57,6 @@ public class ExRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.View
         } else if (viewType == TYPE_HEADER) {
             FrameLayout frameLayout = new FrameLayout(parent.getContext());
             frameLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-            //View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.header_layout,parent,false);
             return new HeaderViewHolder(frameLayout);
         } else {
             FrameLayout frameLayout = new FrameLayout(parent.getContext());
@@ -78,9 +80,8 @@ public class ExRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.View
             footerViewHolder.frameLayout.removeAllViews();
             footerViewHolder.frameLayout.addView(view);
         } else {
-            Log.d("getItemCount", getItemCount() + "");
-            final ItemViewHolder itemViewHolder = (ItemViewHolder) holder;
-            itemCover = items.get(position + headers.size());
+            itemViewHolder = (ItemViewHolder) holder;
+            ItemCover itemCover = items.get(position - headers.size());
             Glide.with(context).load(itemCover.getUrl()).into(itemViewHolder.iv_cover);
             itemViewHolder.tv_title.setText(itemCover.getTitle());
             itemViewHolder.tv_like.setText(itemCover.getLike());

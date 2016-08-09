@@ -38,6 +38,7 @@ public class IndexFragment extends Fragment {
         final int pageMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, getResources()
                 .getDisplayMetrics());
         viewPager.setPageMargin(pageMargin);
+        viewPager.setOffscreenPageLimit(5);
         pagerSlidingTabStrip.setViewPager(viewPager);
         return view;
     }

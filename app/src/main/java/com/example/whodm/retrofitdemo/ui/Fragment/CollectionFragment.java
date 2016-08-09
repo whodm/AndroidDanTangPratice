@@ -36,25 +36,23 @@ import java.util.List;
 public class CollectionFragment extends Fragment implements BannerCallback, IndexCallback {
     private static String TAG = "CollectionFragment";
     private LoopView loopView;
-    //    private FrameLayout frameLayout;
     private List<String> imagesUrl = new ArrayList<>();
     private static int COLLECTION = 4;
     private final static HttpService httpservice = new HttpService();
     private RecyclerView recyclerView;
     private ExRecycleViewAdapter exRecycleViewAdapter;
-    private ItemCover itemCover = new ItemCover();
     private List<ItemCover> itemCoverList = new ArrayList<>();
-    private List<View> header = new ArrayList<>();
-    final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+    private final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+    private static int offset = 0;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_collection,container,false);
-//        frameLayout = (FrameLayout) view.findViewById(R.id.frameContainer);
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
+        //exRecycleViewAdapter = new ExRecycleViewAdapter(getActivity());
         init();
         return view;
     }
@@ -64,14 +62,13 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
         httpservice.indexService(COLLECTION, 0, this);
     }
 
+
     @Override
     public void onBannerSuccess(List<Banners> bannerList) {
         for (int i = 0; i < bannerList.size(); i++) {
             imagesUrl.add(bannerList.get(i).getImage_url());
         }
         loopView = new LoopView(getContext(), imagesUrl);
-        header.add(loopView);
-        //frameLayout.addView(loopView);
     }
 
     @Override
@@ -81,14 +78,23 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
 
     @Override
     public void onIndexSuccess(List<Item> list) {
+        offset = offset + 20;
         for (int i = 0; i < list.size(); i++) {
+            ItemCover itemCover = new ItemCover();
             itemCover.setUrl(list.get(i).cover_image_url);
             Log.d(TAG, itemCover.getUrl());
             itemCover.setTitle(list.get(i).title);
             itemCover.setLike(list.get(i).likes_count.toString());
             itemCoverList.add(itemCover);
         }
-        exRecycleViewAdapter = new ExRecycleViewAdapter(itemCoverList, header, getActivity());
+        exRecycleViewAdapter = new ExRecycleViewAdapter(itemCoverList, getContext());
+        exRecycleViewAdapter.addHeader(loopView);
+        exRecycleViewAdapter.setEndlessLoadListener(new ExRecycleViewAdapter.EndlessLoadListener() {
+            @Override
+            public void loadMore() {
+                //httpservice.indexService(COLLECTION,offset,);
+            }
+        });
         recyclerView.setAdapter(exRecycleViewAdapter);
     }
 
