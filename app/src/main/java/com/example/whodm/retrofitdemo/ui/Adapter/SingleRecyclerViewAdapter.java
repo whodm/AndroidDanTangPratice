@@ -90,6 +90,7 @@ public class SingleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
             itemViewHolder.tv_title.setText(singleCover.getTitle());
             itemViewHolder.tv_like.setText(singleCover.getLike());
             itemViewHolder.tv_price.setText(singleCover.getPrice());
+            itemViewHolder.url = singleCover.getContent_url();
             Glide.with(context)
                     .load(singleCover.getUrl())
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
@@ -98,8 +99,7 @@ public class SingleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
                 itemViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        int pos = holder.getAdapterPosition() - headers.size();
-                        onItemClickListener.ItemClickListener(itemViewHolder.itemView, pos);
+                        onItemClickListener.ItemClickListener(itemViewHolder.itemView, itemViewHolder.url);
                     }
                 });
             }
@@ -118,7 +118,7 @@ public class SingleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
     }
 
     public interface OnItemClickListener {
-        void ItemClickListener(View view, int postion);
+        void ItemClickListener(View view, String url);
     }
 
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
@@ -178,6 +178,7 @@ public class SingleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
         private TextView tv_title;
         private TextView tv_like;
         private TextView tv_price;
+        private String url;
 
         public ItemViewHolder(View itemView) {
             super(itemView);

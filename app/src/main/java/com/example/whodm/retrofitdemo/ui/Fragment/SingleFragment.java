@@ -27,10 +27,9 @@ import java.util.List;
  * Created by X on 2016/8/8.
  */
 public class SingleFragment extends Fragment implements SingleCallback {
-    private HttpService httpService = new HttpService();
+    private final static HttpService httpService = new HttpService();
     private RecyclerView recyclerView;
     private SingleRecyclerViewAdapter singleRecyclerViewAdapter;
-    private List<SingleCover> itemCoverList = new ArrayList<>();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -46,6 +45,21 @@ public class SingleFragment extends Fragment implements SingleCallback {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setHasFixedSize(true);
         singleRecyclerViewAdapter = new SingleRecyclerViewAdapter(getActivity());
+        singleRecyclerViewAdapter.setEndlessLoadListener(new SingleRecyclerViewAdapter.EndlessLoadListener() {
+            @Override
+            public void loadMore() {
+
+            }
+        });
+        singleRecyclerViewAdapter.setOnItemClickListener(new SingleRecyclerViewAdapter.OnItemClickListener() {
+            @Override
+            public void ItemClickListener(View view, String url) {
+                Intent intent = new Intent(getActivity(), WebViewActivity.class);
+                intent.putExtra("URL", url);
+                startActivity(intent);
+            }
+        });
+        recyclerView.setAdapter(singleRecyclerViewAdapter);
         init();
         return view;
     }
@@ -56,6 +70,7 @@ public class SingleFragment extends Fragment implements SingleCallback {
 
     @Override
     public void onSingleSuccess(SingleData singleData) {
+        List<SingleCover> itemCoverList = new ArrayList<>();
         SingleData single = singleData;
         for (int i = 0; i < single.items.size(); i++) {
             SingleCover singleCover = new SingleCover();
@@ -67,26 +82,15 @@ public class SingleFragment extends Fragment implements SingleCallback {
             itemCoverList.add(singleCover);
         }
         singleRecyclerViewAdapter.addItem(itemCoverList);
-        singleRecyclerViewAdapter.setEndlessLoadListener(new SingleRecyclerViewAdapter.EndlessLoadListener() {
-            @Override
-            public void loadMore() {
-
-            }
-        });
-        singleRecyclerViewAdapter.setOnItemClickListener(new SingleRecyclerViewAdapter.OnItemClickListener() {
-            @Override
-            public void ItemClickListener(View view, int postion) {
-                String url = itemCoverList.get(postion).getContent_url();
-                Intent intent = new Intent(getActivity(), WebViewActivity.class);
-                intent.putExtra("URL", url);
-                startActivity(intent);
-            }
-        });
-        recyclerView.setAdapter(singleRecyclerViewAdapter);
     }
 
     @Override
     public void onSingleFail() {
         Toast.makeText(getContext(), "Index连接失败", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onSingleNothing() {
+        Toast.makeText(getContext(), "没有更多了", Toast.LENGTH_LONG).show();
     }
 }

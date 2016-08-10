@@ -20,6 +20,7 @@ import com.example.whodm.retrofitdemo.R;
 import com.example.whodm.retrofitdemo.callback.IndexCallback;
 import com.example.whodm.retrofitdemo.ui.DetailActivity;
 import com.example.whodm.retrofitdemo.ui.WebViewActivity;
+import com.example.whodm.retrofitdemo.ui.model.Banner;
 import com.example.whodm.retrofitdemo.ui.model.ItemCover;
 import com.example.whodm.retrofitdemo.model.banners.Banners;
 import com.example.whodm.retrofitdemo.model.index.Item;
@@ -35,15 +36,12 @@ import java.util.List;
  */
 public class CollectionFragment extends Fragment implements BannerCallback, IndexCallback {
     private static String TAG = "CollectionFragment";
-    private LoopView loopView;
-    private List<String> imagesUrl = new ArrayList<>();
     private static int COLLECTION = 4;
     private final static HttpService httpservice = new HttpService();
     private RecyclerView recyclerView;
     private ItemRecyclerViewAdapter itemRecyclerViewAdapter;
-    private List<ItemCover> itemCoverList = new ArrayList<>();
     private final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-    private static int offset = 0;
+    private int offset = 0;
 
     @Nullable
     @Override
@@ -55,16 +53,16 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
         recyclerView.setHasFixedSize(true);
         itemRecyclerViewAdapter = new ItemRecyclerViewAdapter(getActivity());
         init();
+        recyclerView.setAdapter(itemRecyclerViewAdapter);
         itemRecyclerViewAdapter.setEndlessLoadListener(new ItemRecyclerViewAdapter.EndlessLoadListener() {
             @Override
             public void loadMore() {
-
+                onUpdate();
             }
         });
         itemRecyclerViewAdapter.setOnItemClickListener(new ItemRecyclerViewAdapter.OnItemClickListener() {
             @Override
-            public void ItemClickListener(View view, int postion) {
-                String url = itemCoverList.get(postion).getContent_url();
+            public void ItemClickListener(View view, String url) {
                 Intent intent = new Intent(getActivity(), WebViewActivity.class);
                 intent.putExtra("URL", url);
                 startActivity(intent);
@@ -75,16 +73,28 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
 
     public void init() {
         httpservice.bannerService(this);
-        httpservice.indexService(COLLECTION, 0, this);
+        httpservice.indexService(COLLECTION, offset, this);
     }
 
 
     @Override
     public void onBannerSuccess(List<Banners> bannerList) {
+        List<Banner> imagesUrl = new ArrayList<>();
+
         for (int i = 0; i < bannerList.size(); i++) {
-            imagesUrl.add(bannerList.get(i).getImage_url());
+//            imagesUrl.add(bannerList.get(i).getImage_url());
+            Banner banner = new Banner();
+            banner.setId(bannerList.get(i).getTarget_id());
+            banner.setUrl(bannerList.get(i).getImage_url());
+            imagesUrl.add(banner);
         }
-        loopView = new LoopView(getContext(), imagesUrl);
+        LoopView loopView = new LoopView(getContext(), imagesUrl);
+        loopView.setOnItemClickListener(new LoopView.OnItemClickListener() {
+            @Override
+            public void ItemClickListener(String id) {
+                Log.d(TAG, "id = " + id);
+            }
+        });
         itemRecyclerViewAdapter.addHeader(loopView);
     }
 
@@ -94,11 +104,13 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
     }
 
     public void onUpdate() {
-        httpservice.indexService(COLLECTION, 20, this);
+        offset = offset + 20;
+        httpservice.indexService(COLLECTION, offset, this);
     }
 
     @Override
     public void onIndexSuccess(List<Item> list) {
+        List<ItemCover> itemCoverList = new ArrayList<>();
         for (int i = 0; i < list.size(); i++) {
             ItemCover itemCover = new ItemCover();
             itemCover.setUrl(list.get(i).cover_image_url);
@@ -109,12 +121,26 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
             itemCoverList.add(itemCover);
         }
         itemRecyclerViewAdapter.addItem(itemCoverList);
-        //itemRecyclerViewAdapter.notifyDataSetChanged();
-        recyclerView.setAdapter(itemRecyclerViewAdapter);
+        recyclerView.post(new Runnable() {
+            @Override
+            public void run() {
+                itemRecyclerViewAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     @Override
     public void onIndexFail() {
         Toast.makeText(getContext(), "Index连接失败", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onBannerNothing() {
+        Toast.makeText(getContext(), "没有更多了", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onIndexNothing() {
+        Toast.makeText(getContext(), "没有更多了", Toast.LENGTH_LONG).show();
     }
 }

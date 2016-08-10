@@ -10,5 +10,6 @@ import java.util.List;
 public interface BannerCallback {
     void onBannerSuccess(List<Banners> bannerList);
 
+    void onBannerNothing();
     void onBannerFail();
 }

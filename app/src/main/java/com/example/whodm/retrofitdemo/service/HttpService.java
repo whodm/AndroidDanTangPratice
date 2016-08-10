@@ -36,7 +36,7 @@ import retrofit.Retrofit;
  * Created by whodm on 2016/8/7.
  */
 public class HttpService {
-    private Retrofit retrofit;
+    private static Retrofit retrofit;
     private API api;
     public HttpService() {
         retrofit = new Retrofit.Builder()
@@ -54,7 +54,7 @@ public class HttpService {
             public void onResponse(Response<BaseModel<AllData>> response, Retrofit retrofit) {
                 if (response.body().data == null || response.body().data.collections.size() == 0) {
                     Log.d("onRespone allData","Null");
-                    callback.onFail();
+                    callback.onAllTopicNothing();
                 } else {
                     Log.d("onRespone allData",response.body().data.collections.toString());
                     callback.onAllTopicSuccess(response.body().data);
@@ -96,10 +96,8 @@ public class HttpService {
             @Override
             public void onResponse(Response<BaseModel<BottomStyleData>> response, Retrofit retrofit) {
                 if (response.body().data == null || response.body().data.channel_groups.size() == 0) {
-                    Log.d("onRespone bottomStyle","Null");
-                    callback.onClassesFail();
+                    callback.onClassesNothing();
                 } else {
-                    Log.d("onRespone bottomStyle", response.body().data.channel_groups.get(0).channels.get(0).getName().toString());
                     callback.onClassesSuccess(response.body().data);
                 }
             }
@@ -162,7 +160,7 @@ public class HttpService {
             public void onResponse(Response<BaseModel<SingleData>> response, Retrofit retrofit) {
                 if (response.body().data == null || response.body().data.items.size() == 0) {
                     Log.d("onRespone single","Null");
-                    callback.onSingleFail();
+                    callback.onSingleNothing();
                 } else {
                     Log.d("onRespone single",response.body().data.items.toString());
                     callback.onSingleSuccess(response.body().data);
@@ -247,7 +245,7 @@ public class HttpService {
             public void onResponse(Response<BaseModel<IndexData<ArrayList<Item>>>> response, Retrofit retrofit) {
                 if (response.body().data.items == null || response.body().data.items.size() == 0) {
                     Log.d("onRespone index",response.body().data.items+"");
-                    callback.onIndexFail();
+                    callback.onIndexNothing();
                 } else {
                     Log.d("onRespone index",response.body().data.items.get(1).content_url);
                     callback.onIndexSuccess(response.body().data.items);
@@ -268,7 +266,7 @@ public class HttpService {
             public void onResponse(Response<BaseModel<BannerData<ArrayList<Banners>>>> response, Retrofit retrofit) {
                 if (response.body().data.banners == null || response.body().data.banners.size() == 0) {
                     Log.d("onRespone banner", "nothing in here");
-                    callback.onBannerFail();
+                    callback.onBannerNothing();
                 } else {
                     Log.d("onRespone banner", response.body().data.banners.get(0).getImage_url());
                     callback.onBannerSuccess(response.body().data.banners);

@@ -67,6 +67,7 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
         Log.d("Position", position + "");
         if (position < headers.size()) {
             HeaderViewHolder headerViewHolder = (HeaderViewHolder) holder;
+//            View view = headers.get(position);
             View view = headers.get(position);
             if (headerViewHolder.frameLayout.getChildCount() == 0) {
                 headerViewHolder.frameLayout.addView(view);
@@ -85,16 +86,17 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
             ItemCover itemCover = items.get(position - headers.size());
             Glide.with(context)
                     .load(itemCover.getUrl())
+                    .placeholder(R.drawable.loading)
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(itemViewHolder.iv_cover);
             itemViewHolder.tv_title.setText(itemCover.getTitle());
             itemViewHolder.tv_like.setText(itemCover.getLike());
+            itemViewHolder.url = itemCover.getContent_url();
             if (onItemClickListener != null) {
                 itemViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        int pos = holder.getAdapterPosition() - headers.size();
-                        onItemClickListener.ItemClickListener(itemViewHolder.itemView, pos);
+                        onItemClickListener.ItemClickListener(itemViewHolder.itemView, itemViewHolder.url);
                     }
                 });
             }
@@ -102,6 +104,11 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
                 endlessLoadListener.loadMore();
             }
         }
+    }
+
+    @Override
+    public void onViewRecycled(RecyclerView.ViewHolder holder) {
+        super.onViewRecycled(holder);
     }
 
     public void setEndlessLoadListener(EndlessLoadListener endlessLoadListener) {
@@ -113,7 +120,7 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     public interface OnItemClickListener {
-        void ItemClickListener(View view, int postion);
+        void ItemClickListener(View view, String url);
     }
 
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
@@ -173,6 +180,7 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
         private ImageView iv_cover;
         private TextView tv_title;
         private TextView tv_like;
+        private String url;
 
         public ItemViewHolder(View itemView) {
             super(itemView);

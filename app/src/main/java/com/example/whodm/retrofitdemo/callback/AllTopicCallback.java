@@ -10,6 +10,7 @@ import java.util.List;
 public interface AllTopicCallback {
     void onAllTopicSuccess(AllData data);
 
+    void onAllTopicNothing();
     void onFail();
 
 }

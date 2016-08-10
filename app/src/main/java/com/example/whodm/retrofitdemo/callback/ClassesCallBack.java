@@ -10,5 +10,6 @@ import java.util.List;
 public interface ClassesCallback {
     void onClassesSuccess(BottomStyleData bottomStyleData);
 
+    void onClassesNothing();
     void onClassesFail();
 }

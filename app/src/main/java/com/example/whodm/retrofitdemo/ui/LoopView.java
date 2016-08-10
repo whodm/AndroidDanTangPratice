@@ -18,6 +18,7 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.example.whodm.retrofitdemo.R;
+import com.example.whodm.retrofitdemo.ui.model.Banner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,10 +37,12 @@ public class LoopView extends FrameLayout {
     //自动轮播启用开关
     private final static boolean isAutoPlay = true;
     //ImageView资源ID
-    private List<String> imageUrl;
+    private List<Banner> imageUrl;
     private List<ImageView> imageViewList;
     private List<View> dotViewList;
     private ViewPager viewPager;
+    private List<String> ids;
+    private OnItemClickListener onItemClickListener;
     //当前轮播页面
     private int currentItem = 0;
     //定时任务
@@ -52,7 +55,7 @@ public class LoopView extends FrameLayout {
         }
     };
 
-    public LoopView(Context context, List<String> list) {
+    public LoopView(Context context, List<Banner> list) {
         super(context);
         this.imageUrl = list;
         initImageView();
@@ -60,21 +63,21 @@ public class LoopView extends FrameLayout {
         if (isAutoPlay) {
             startPlay();
         }
+//        this.setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                onItemClickListener.ItemClickListener(ids.get(currentItem));
+//            }
+//        });
     }
 
-//    public LoopView(Context context, AttributeSet attributeSet) {
-//        this(context, attributeSet, 0);
-//    }
-//
-//    public LoopView(Context context, AttributeSet attributeSet, int defStyle) {
-//        super(context, attributeSet, defStyle);
-//        initImageView();
-//        initUI(context);
-//        if (isAutoPlay) {
-//            startPlay();
-//        }
-//
-//    }
+    public interface OnItemClickListener {
+        void ItemClickListener(String id);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
+    }
 
     /**
      * 开始轮播图切换
@@ -99,11 +102,21 @@ public class LoopView extends FrameLayout {
      */
     private void initUI(Context context) {
         LayoutInflater.from(context).inflate(R.layout.load_view, this, true);
-        for (String imagesID : imageUrl) {
+//        for (String imagesID : imageUrl.get()) {
+//            ImageView view = new ImageView(context);
+////            view.setImageResource(imagesID);
+//            Glide.with(getContext()).load(imagesID).into(view);
+//            view.setScaleType(ImageView.ScaleType.FIT_XY);
+//            imageViewList.add(view);
+//        }
+        for (int i = 0; i < imageUrl.size(); i++) {
             ImageView view = new ImageView(context);
-//            view.setImageResource(imagesID);
-            Glide.with(getContext()).load(imagesID).into(view);
+            Glide.with(context)
+                    .load(imageUrl.get(i).getUrl())
+                    .placeholder(R.drawable.loading)
+                    .into(view);
             view.setScaleType(ImageView.ScaleType.FIT_XY);
+            ids.add(imageUrl.get(i).getId());
             imageViewList.add(view);
         }
         dotViewList.add(findViewById(R.id.v_dot1));
@@ -116,12 +129,9 @@ public class LoopView extends FrameLayout {
         viewPager.setOnPageChangeListener(new MyPageChangeListener());
     }
 
+
     private void initImageView() {
-//        imageResIds = new int[]{
-//                R.drawable.probe,
-//                R.drawable.probe,
-//                R.drawable.probe,
-//        };
+        ids = new ArrayList<>();
         imageViewList = new ArrayList<>();
         dotViewList = new ArrayList<>();
     }
@@ -225,11 +235,14 @@ public class LoopView extends FrameLayout {
         switch (ev.getAction()) {
             case MotionEvent.ACTION_DOWN: {
                 getParent().requestDisallowInterceptTouchEvent(true);
+                onItemClickListener.ItemClickListener(ids.get(currentItem));
                 break;
             }
             case MotionEvent.ACTION_MOVE:
+
                 break;
             case MotionEvent.ACTION_UP:
+
                 break;
         }
         return super.dispatchTouchEvent(ev);

@@ -41,7 +41,7 @@ public class ClassesFragment extends Fragment implements ClassesCallback, AllTop
     private IconRecyclerViewAdapter styleRecyclerViewAdapter;
     private IconRecyclerViewAdapter pinleiRecyclerViewAdapter;
     private TopicRecyclerViewAdapter topicRecyclerViewAdapter;
-    private HttpService httpService = new HttpService();
+    private final static HttpService httpService = new HttpService();
     private List<TopicIcon> topicIcons = new ArrayList<>();
     private List<Icon> iconList_one = new ArrayList<>();
     private List<Icon> iconList_second = new ArrayList<>();
@@ -92,6 +92,16 @@ public class ClassesFragment extends Fragment implements ClassesCallback, AllTop
     @Override
     public void onFail() {
         Toast.makeText(getContext(), "连接失败", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onAllTopicNothing() {
+        Toast.makeText(getContext(), "没有更多了", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onClassesNothing() {
+        Toast.makeText(getContext(), "没有更多了", Toast.LENGTH_LONG).show();
     }
 
     @Override

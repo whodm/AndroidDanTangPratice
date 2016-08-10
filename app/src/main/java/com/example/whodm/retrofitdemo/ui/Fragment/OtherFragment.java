@@ -34,13 +34,13 @@ public class OtherFragment extends Fragment implements IndexCallback {
     private ItemRecyclerViewAdapter itemRecyclerViewAdapter;
     private final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
     private int position;
-    private HttpService httpService = new HttpService();
-    private List<ItemCover> itemCoverList = new ArrayList<>();
+    private final static HttpService httpService = new HttpService();
     private static int Foods = 14;
     private static int Housing = 16;
     private static int Digtal = 17;
     private static int Beauty = 13;
     private static int Groceries = 22;
+    private int offset = 0;
 
 
     public static OtherFragment newInstance(int position){
@@ -66,6 +66,21 @@ public class OtherFragment extends Fragment implements IndexCallback {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         itemRecyclerViewAdapter = new ItemRecyclerViewAdapter(getActivity());
+        itemRecyclerViewAdapter.setEndlessLoadListener(new ItemRecyclerViewAdapter.EndlessLoadListener() {
+            @Override
+            public void loadMore() {
+                onUpdate();
+            }
+        });
+        itemRecyclerViewAdapter.setOnItemClickListener(new ItemRecyclerViewAdapter.OnItemClickListener() {
+            @Override
+            public void ItemClickListener(View view, String url) {
+                Intent intent = new Intent(getActivity(), WebViewActivity.class);
+                intent.putExtra("URL", url);
+                startActivity(intent);
+            }
+        });
+        recyclerView.setAdapter(itemRecyclerViewAdapter);
         init();
         return view;
     }
@@ -73,28 +88,53 @@ public class OtherFragment extends Fragment implements IndexCallback {
     public void init() {
         switch (position) {
             case 1:
-                httpService.indexService(Foods, 0, this);
+                httpService.indexService(Foods, offset, this);
                 break;
             case 2:
-                httpService.indexService(Housing, 0, this);
+                httpService.indexService(Housing, offset, this);
                 break;
             case 3:
-                httpService.indexService(Digtal, 0, this);
+                httpService.indexService(Digtal, offset, this);
                 break;
             case 4:
-                httpService.indexService(Beauty, 0, this);
+                httpService.indexService(Beauty, offset, this);
                 break;
             case 5:
-                httpService.indexService(Groceries, 0, this);
+                httpService.indexService(Groceries, offset, this);
                 break;
             default:
-                httpService.indexService(Foods, 0, this);
+                httpService.indexService(Foods, offset, this);
+                break;
+        }
+    }
+
+    public void onUpdate() {
+        offset = offset + 20;
+        switch (position) {
+            case 1:
+                httpService.indexService(Foods, offset, this);
+                break;
+            case 2:
+                httpService.indexService(Housing, offset, this);
+                break;
+            case 3:
+                httpService.indexService(Digtal, offset, this);
+                break;
+            case 4:
+                httpService.indexService(Beauty, offset, this);
+                break;
+            case 5:
+                httpService.indexService(Groceries, offset, this);
+                break;
+            default:
+                httpService.indexService(Foods, offset, this);
                 break;
         }
     }
 
     @Override
     public void onIndexSuccess(List<Item> list) {
+        List<ItemCover> itemCoverList = new ArrayList<>();
         for (int i = 0; i < list.size(); i++) {
             ItemCover itemCover = new ItemCover();
             itemCover.setUrl(list.get(i).cover_image_url);
@@ -105,26 +145,21 @@ public class OtherFragment extends Fragment implements IndexCallback {
             itemCoverList.add(itemCover);
         }
         itemRecyclerViewAdapter.addItem(itemCoverList);
-        itemRecyclerViewAdapter.setEndlessLoadListener(new ItemRecyclerViewAdapter.EndlessLoadListener() {
+        recyclerView.post(new Runnable() {
             @Override
-            public void loadMore() {
-                //httpservice.indexService(COLLECTION,offset,);
+            public void run() {
+                itemRecyclerViewAdapter.notifyDataSetChanged();
             }
         });
-        itemRecyclerViewAdapter.setOnItemClickListener(new ItemRecyclerViewAdapter.OnItemClickListener() {
-            @Override
-            public void ItemClickListener(View view, int postion) {
-                String url = itemCoverList.get(postion).getContent_url();
-                Intent intent = new Intent(getActivity(), WebViewActivity.class);
-                intent.putExtra("URL", url);
-                startActivity(intent);
-            }
-        });
-        recyclerView.setAdapter(itemRecyclerViewAdapter);
     }
 
     @Override
     public void onIndexFail() {
         Toast.makeText(getContext(), "Index连接失败", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onIndexNothing() {
+        Toast.makeText(getContext(), "没有更多了", Toast.LENGTH_LONG).show();
     }
 }

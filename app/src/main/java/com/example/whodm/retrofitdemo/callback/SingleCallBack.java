@@ -10,5 +10,6 @@ import java.util.List;
 public interface SingleCallback {
     void onSingleSuccess(SingleData singleData);
 
+    void onSingleNothing();
     void onSingleFail();
 }
