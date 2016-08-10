@@ -25,7 +25,10 @@ public class WebViewActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent i = getIntent();
-        URL = i.getStringExtra("Url");
+        URL = i.getStringExtra("URL");
+        if (URL.isEmpty()) {
+            return;
+        }
         // 取消标题
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_web_view);
@@ -49,10 +52,10 @@ public class WebViewActivity extends AppCompatActivity {
                 finish();
             }
         });
-//        /**
-//         * 设置WebView的属性，此时可以去执行JavaScript脚本
-//         */
-//        webView.getSettings().setJavaScriptEnabled(true);
+        /**
+         * 设置WebView的属性，此时可以去执行JavaScript脚本
+         */
+        webView.getSettings().setJavaScriptEnabled(true);
     }
 
     Handler handler = new Handler(){

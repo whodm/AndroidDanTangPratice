@@ -1,13 +1,12 @@
-package com.example.whodm.retrofitdemo.model;
-
-import android.widget.ImageView;
+package com.example.whodm.retrofitdemo.ui.model;
 
 /**
- * Created by X on 2016/8/9.
+ * Created by X on 2016/8/10.
  */
-public class ItemCover {
+public class SingleCover {
     private String url;
     private String title;
+    private String price;
     private String like;
     private String content_url;
 
@@ -25,6 +24,14 @@ public class ItemCover {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getPrice() {
+        return price;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
     }
 
     public String getLike() {

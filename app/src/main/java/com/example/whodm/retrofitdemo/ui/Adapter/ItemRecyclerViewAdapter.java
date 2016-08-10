@@ -11,8 +11,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.whodm.retrofitdemo.R;
-import com.example.whodm.retrofitdemo.model.ItemCover;
+import com.example.whodm.retrofitdemo.ui.model.ItemCover;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +21,7 @@ import java.util.List;
 /**
  * Created by whodm on 2016/7/9.
  */
-public class ExRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     //our items
     List<ItemCover> items = new ArrayList<>();
     //headers
@@ -40,14 +41,9 @@ public class ExRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     private OnItemClickListener onItemClickListener;
 
-    public ExRecycleViewAdapter(List<ItemCover> items, Context context) {
-        this.items = items;
+    public ItemRecyclerViewAdapter(Context context) {
         this.context = context;
     }
-
-    //    public ExRecycleViewAdapter(Context context) {
-//        this.context = context;
-//    }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -67,13 +63,18 @@ public class ExRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.View
 
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
         Log.d("Position", position + "");
         if (position < headers.size()) {
             HeaderViewHolder headerViewHolder = (HeaderViewHolder) holder;
             View view = headers.get(position);
-            headerViewHolder.frameLayout.removeAllViews();
-            headerViewHolder.frameLayout.addView(view);
+            if (headerViewHolder.frameLayout.getChildCount() == 0) {
+                headerViewHolder.frameLayout.addView(view);
+            } else {
+                headerViewHolder.frameLayout.removeAllViews();
+                headerViewHolder.frameLayout.addView(view);
+            }
+
         } else if (position >= headers.size() + items.size()) {
             FooterViewHolder footerViewHolder = (FooterViewHolder) holder;
             View view = footers.get(position - headers.size() - items.size());
@@ -82,14 +83,17 @@ public class ExRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.View
         } else {
             itemViewHolder = (ItemViewHolder) holder;
             ItemCover itemCover = items.get(position - headers.size());
-            Glide.with(context).load(itemCover.getUrl()).into(itemViewHolder.iv_cover);
+            Glide.with(context)
+                    .load(itemCover.getUrl())
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .into(itemViewHolder.iv_cover);
             itemViewHolder.tv_title.setText(itemCover.getTitle());
             itemViewHolder.tv_like.setText(itemCover.getLike());
             if (onItemClickListener != null) {
                 itemViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        int pos = itemViewHolder.getPosition();
+                        int pos = holder.getAdapterPosition() - headers.size();
                         onItemClickListener.ItemClickListener(itemViewHolder.itemView, pos);
                     }
                 });
@@ -145,6 +149,7 @@ public class ExRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.View
             Log.d("addHeader", header + "");
         }
     }
+
 
     public static class HeaderViewHolder extends RecyclerView.ViewHolder {
         private FrameLayout frameLayout;

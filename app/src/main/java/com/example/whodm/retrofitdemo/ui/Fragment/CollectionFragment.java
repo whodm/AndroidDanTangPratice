@@ -1,7 +1,9 @@
 package com.example.whodm.retrofitdemo.ui.Fragment;
 
-import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -11,20 +13,18 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.example.whodm.retrofitdemo.callback.BannerCallback;
 import com.example.whodm.retrofitdemo.R;
 import com.example.whodm.retrofitdemo.callback.IndexCallback;
-import com.example.whodm.retrofitdemo.model.ItemCover;
+import com.example.whodm.retrofitdemo.ui.DetailActivity;
+import com.example.whodm.retrofitdemo.ui.WebViewActivity;
+import com.example.whodm.retrofitdemo.ui.model.ItemCover;
 import com.example.whodm.retrofitdemo.model.banners.Banners;
 import com.example.whodm.retrofitdemo.model.index.Item;
 import com.example.whodm.retrofitdemo.service.HttpService;
-import com.example.whodm.retrofitdemo.ui.Adapter.ExRecycleViewAdapter;
+import com.example.whodm.retrofitdemo.ui.Adapter.ItemRecyclerViewAdapter;
 import com.example.whodm.retrofitdemo.ui.LoopView;
 
 import java.util.ArrayList;
@@ -40,7 +40,7 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
     private static int COLLECTION = 4;
     private final static HttpService httpservice = new HttpService();
     private RecyclerView recyclerView;
-    private ExRecycleViewAdapter exRecycleViewAdapter;
+    private ItemRecyclerViewAdapter itemRecyclerViewAdapter;
     private List<ItemCover> itemCoverList = new ArrayList<>();
     private final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
     private static int offset = 0;
@@ -52,8 +52,24 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        //exRecycleViewAdapter = new ExRecycleViewAdapter(getActivity());
+        recyclerView.setHasFixedSize(true);
+        itemRecyclerViewAdapter = new ItemRecyclerViewAdapter(getActivity());
         init();
+        itemRecyclerViewAdapter.setEndlessLoadListener(new ItemRecyclerViewAdapter.EndlessLoadListener() {
+            @Override
+            public void loadMore() {
+
+            }
+        });
+        itemRecyclerViewAdapter.setOnItemClickListener(new ItemRecyclerViewAdapter.OnItemClickListener() {
+            @Override
+            public void ItemClickListener(View view, int postion) {
+                String url = itemCoverList.get(postion).getContent_url();
+                Intent intent = new Intent(getActivity(), WebViewActivity.class);
+                intent.putExtra("URL", url);
+                startActivity(intent);
+            }
+        });
         return view;
     }
 
@@ -69,6 +85,7 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
             imagesUrl.add(bannerList.get(i).getImage_url());
         }
         loopView = new LoopView(getContext(), imagesUrl);
+        itemRecyclerViewAdapter.addHeader(loopView);
     }
 
     @Override
@@ -76,26 +93,24 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
         Toast.makeText(getContext(), "滚滚滚连接失败", Toast.LENGTH_LONG).show();
     }
 
+    public void onUpdate() {
+        httpservice.indexService(COLLECTION, 20, this);
+    }
+
     @Override
     public void onIndexSuccess(List<Item> list) {
-        offset = offset + 20;
         for (int i = 0; i < list.size(); i++) {
             ItemCover itemCover = new ItemCover();
             itemCover.setUrl(list.get(i).cover_image_url);
             Log.d(TAG, itemCover.getUrl());
             itemCover.setTitle(list.get(i).title);
             itemCover.setLike(list.get(i).likes_count.toString());
+            itemCover.setContent_url(list.get(i).content_url);
             itemCoverList.add(itemCover);
         }
-        exRecycleViewAdapter = new ExRecycleViewAdapter(itemCoverList, getContext());
-        exRecycleViewAdapter.addHeader(loopView);
-        exRecycleViewAdapter.setEndlessLoadListener(new ExRecycleViewAdapter.EndlessLoadListener() {
-            @Override
-            public void loadMore() {
-                //httpservice.indexService(COLLECTION,offset,);
-            }
-        });
-        recyclerView.setAdapter(exRecycleViewAdapter);
+        itemRecyclerViewAdapter.addItem(itemCoverList);
+        //itemRecyclerViewAdapter.notifyDataSetChanged();
+        recyclerView.setAdapter(itemRecyclerViewAdapter);
     }
 
     @Override

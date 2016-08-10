@@ -2,6 +2,7 @@ package com.example.whodm.retrofitdemo.service;
 
 import android.util.Log;
 
+import com.example.whodm.retrofitdemo.callback.AllTopicCallback;
 import com.example.whodm.retrofitdemo.callback.BannerCallback;
 import com.example.whodm.retrofitdemo.callback.ClassesCallback;
 import com.example.whodm.retrofitdemo.callback.IndexCallback;
@@ -37,7 +38,6 @@ import retrofit.Retrofit;
 public class HttpService {
     private Retrofit retrofit;
     private API api;
-    private List<Banners> bannersList;
     public HttpService() {
         retrofit = new Retrofit.Builder()
                 .baseUrl("http://api.dantangapp.com/")
@@ -46,7 +46,7 @@ public class HttpService {
         api = retrofit.create(API.class);
     }
     //专题合集 -> 查看全部
-    public void allData(int i){
+    public void allTopicService(int i, final AllTopicCallback callback) {
         Call<BaseModel<AllData>> call = api.defaultAll(i);
 
         call.enqueue(new Callback<BaseModel<AllData>>() {
@@ -54,15 +54,16 @@ public class HttpService {
             public void onResponse(Response<BaseModel<AllData>> response, Retrofit retrofit) {
                 if (response.body().data == null || response.body().data.collections.size() == 0) {
                     Log.d("onRespone allData","Null");
-
+                    callback.onFail();
                 } else {
                     Log.d("onRespone allData",response.body().data.collections.toString());
+                    callback.onAllTopicSuccess(response.body().data);
                 }
             }
 
             @Override
             public void onFailure(Throwable t) {
-
+                callback.onFail();
             }
         });
     }
@@ -98,7 +99,7 @@ public class HttpService {
                     Log.d("onRespone bottomStyle","Null");
                     callback.onClassesFail();
                 } else {
-                    Log.d("onRespone bottomStyle",response.body().data.channel_groups.toString());
+                    Log.d("onRespone bottomStyle", response.body().data.channel_groups.get(0).channels.get(0).getName().toString());
                     callback.onClassesSuccess(response.body().data);
                 }
             }
@@ -110,6 +111,7 @@ public class HttpService {
         });
     }
     //专题列表数据 -> 专题详情
+    //通过获取id得到专题列表
     public void topDetailService(){
         Call<BaseModel<TopicDetailData>> call = api.defaultTopicDetail();
 
@@ -131,7 +133,6 @@ public class HttpService {
         });
     }
     //专题合集 -> 专题列表数据
-    //通过获取id得到专题列表
     public void topicService(int id, int offset) {
         Call<BaseModel<TopicData>> call = api.defaultTopic(id, offset);
 

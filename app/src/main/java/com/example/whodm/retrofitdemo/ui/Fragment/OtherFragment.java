@@ -1,5 +1,6 @@
 package com.example.whodm.retrofitdemo.ui.Fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -10,15 +11,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.whodm.retrofitdemo.R;
 import com.example.whodm.retrofitdemo.callback.IndexCallback;
-import com.example.whodm.retrofitdemo.model.ItemCover;
+import com.example.whodm.retrofitdemo.ui.WebViewActivity;
+import com.example.whodm.retrofitdemo.ui.model.ItemCover;
 import com.example.whodm.retrofitdemo.model.index.Item;
 import com.example.whodm.retrofitdemo.service.HttpService;
-import com.example.whodm.retrofitdemo.ui.Adapter.ExRecycleViewAdapter;
+import com.example.whodm.retrofitdemo.ui.Adapter.ItemRecyclerViewAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +31,7 @@ public class OtherFragment extends Fragment implements IndexCallback {
     private static String TAG = "otherFragment";
     private static final String ARG_POSITION = "position";
     private RecyclerView recyclerView;
-    private ExRecycleViewAdapter exRecycleViewAdapter;
+    private ItemRecyclerViewAdapter itemRecyclerViewAdapter;
     private final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
     private int position;
     private HttpService httpService = new HttpService();
@@ -64,7 +65,7 @@ public class OtherFragment extends Fragment implements IndexCallback {
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_channel);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        //exRecycleViewAdapter = new ExRecycleViewAdapter(getActivity());
+        itemRecyclerViewAdapter = new ItemRecyclerViewAdapter(getActivity());
         init();
         return view;
     }
@@ -100,17 +101,26 @@ public class OtherFragment extends Fragment implements IndexCallback {
             Log.d(TAG, itemCover.getUrl());
             itemCover.setTitle(list.get(i).title);
             itemCover.setLike(list.get(i).likes_count.toString());
+            itemCover.setContent_url(list.get(i).content_url);
             itemCoverList.add(itemCover);
         }
-        //exRecycleViewAdapter.addItem(itemCoverList);
-        exRecycleViewAdapter = new ExRecycleViewAdapter(itemCoverList, getContext());
-        exRecycleViewAdapter.setEndlessLoadListener(new ExRecycleViewAdapter.EndlessLoadListener() {
+        itemRecyclerViewAdapter.addItem(itemCoverList);
+        itemRecyclerViewAdapter.setEndlessLoadListener(new ItemRecyclerViewAdapter.EndlessLoadListener() {
             @Override
             public void loadMore() {
                 //httpservice.indexService(COLLECTION,offset,);
             }
         });
-        recyclerView.setAdapter(exRecycleViewAdapter);
+        itemRecyclerViewAdapter.setOnItemClickListener(new ItemRecyclerViewAdapter.OnItemClickListener() {
+            @Override
+            public void ItemClickListener(View view, int postion) {
+                String url = itemCoverList.get(postion).getContent_url();
+                Intent intent = new Intent(getActivity(), WebViewActivity.class);
+                intent.putExtra("URL", url);
+                startActivity(intent);
+            }
+        });
+        recyclerView.setAdapter(itemRecyclerViewAdapter);
     }
 
     @Override
