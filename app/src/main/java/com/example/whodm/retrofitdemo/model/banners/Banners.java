@@ -10,7 +10,7 @@ public class Banners {
     public String other;
     public String status;
     public Target target;
-    public String target_id;
+    public int target_id;
     public String target_url;
     public String type;
 
@@ -62,11 +62,11 @@ public class Banners {
         this.target = target;
     }
 
-    public String getTarget_id() {
+    public int getTarget_id() {
         return target_id;
     }
 
-    public void setTarget_id(String target_id) {
+    public void setTarget_id(int target_id) {
         this.target_id = target_id;
     }
 

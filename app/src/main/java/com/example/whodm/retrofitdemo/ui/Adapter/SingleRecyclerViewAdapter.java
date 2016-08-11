@@ -28,7 +28,7 @@ import com.example.whodm.retrofitdemo.ui.util.ScreenUtil;
 /**
  * Created by whodm on 2016/7/9.
  */
-public class SingleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class SingleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements View.OnClickListener {
     //our items
     List<SingleCover> items = new ArrayList<>();
     //headers
@@ -47,18 +47,20 @@ public class SingleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
     private EndlessLoadListener endlessLoadListener;
 
     private OnItemClickListener onItemClickListener;
-
-    private int width, height;
+    ;
 
     public SingleRecyclerViewAdapter(Context context) {
         this.context = context;
+
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == TYPE_ITEM) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.single_layout, parent, false);
-            return new ItemViewHolder(view);
+            ItemViewHolder viewHolder = new ItemViewHolder(view);
+            view.setOnClickListener(this);
+            return viewHolder;
         } else if (viewType == TYPE_HEADER) {
             FrameLayout frameLayout = new FrameLayout(parent.getContext());
             frameLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -90,19 +92,12 @@ public class SingleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
             itemViewHolder.tv_title.setText(singleCover.getTitle());
             itemViewHolder.tv_like.setText(singleCover.getLike());
             itemViewHolder.tv_price.setText(singleCover.getPrice());
-            itemViewHolder.url = singleCover.getContent_url();
+            holder.itemView.setTag(singleCover.getContent_url());
             Glide.with(context)
                     .load(singleCover.getUrl())
+                    .placeholder(R.drawable.loading_single)
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(itemViewHolder.iv_cover);
-            if (onItemClickListener != null) {
-                itemViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        onItemClickListener.ItemClickListener(itemViewHolder.itemView, itemViewHolder.url);
-                    }
-                });
-            }
             if (endlessLoadListener != null && position >= headers.size() + items.size() - 1) {
                 endlessLoadListener.loadMore();
             }
@@ -115,6 +110,11 @@ public class SingleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
 
     public interface EndlessLoadListener {
         void loadMore();
+    }
+
+    @Override
+    public void onClick(View v) {
+        onItemClickListener.ItemClickListener(v, (String) v.getTag());
     }
 
     public interface OnItemClickListener {

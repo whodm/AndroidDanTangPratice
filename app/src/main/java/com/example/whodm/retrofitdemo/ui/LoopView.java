@@ -8,6 +8,8 @@ import android.os.Parcelable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -29,7 +31,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by muyang on 2016/3/24.
  */
-public class LoopView extends FrameLayout {
+public class LoopView extends FrameLayout implements View.OnClickListener {
     //轮播图图片数量
     private final static int IMAGE_COUNT = 3;
     //自动轮播时间间隔
@@ -41,10 +43,12 @@ public class LoopView extends FrameLayout {
     private List<ImageView> imageViewList;
     private List<View> dotViewList;
     private ViewPager viewPager;
-    private List<String> ids;
+    private List<Integer> ids;
     private OnItemClickListener onItemClickListener;
     //当前轮播页面
     private int currentItem = 0;
+
+    private Context content;
     //定时任务
     private ScheduledExecutorService scheduledExecutorService;
     private Handler handler = new Handler() {
@@ -55,28 +59,31 @@ public class LoopView extends FrameLayout {
         }
     };
 
-    public LoopView(Context context, List<Banner> list) {
+    public LoopView(Context context) {
         super(context);
-        this.imageUrl = list;
-        initImageView();
-        initUI(context);
-        if (isAutoPlay) {
-            startPlay();
-        }
-//        this.setOnClickListener(new OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                onItemClickListener.ItemClickListener(ids.get(currentItem));
-//            }
-//        });
+        this.content = context;
+        setOnClickListener(this);
     }
 
     public interface OnItemClickListener {
-        void ItemClickListener(String id);
+        void ItemClickListener(int id);
     }
 
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
+    }
+
+    public List<Banner> getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(List<Banner> imageUrl) {
+        this.imageUrl = imageUrl;
+        initImageView();
+        initUI(content);
+        if (isAutoPlay) {
+            startPlay();
+        }
     }
 
     /**
@@ -86,6 +93,12 @@ public class LoopView extends FrameLayout {
     public void startPlay() {
         scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
         scheduledExecutorService.scheduleAtFixedRate(new LoopTask(), 1, TIME_INTERVAL, TimeUnit.SECONDS);
+    }
+
+    @Override
+    public void onClick(View v) {
+        onItemClickListener.ItemClickListener(ids.get(currentItem));
+        Log.d("LoopView", currentItem + "");
     }
 
     /**
@@ -102,13 +115,6 @@ public class LoopView extends FrameLayout {
      */
     private void initUI(Context context) {
         LayoutInflater.from(context).inflate(R.layout.load_view, this, true);
-//        for (String imagesID : imageUrl.get()) {
-//            ImageView view = new ImageView(context);
-////            view.setImageResource(imagesID);
-//            Glide.with(getContext()).load(imagesID).into(view);
-//            view.setScaleType(ImageView.ScaleType.FIT_XY);
-//            imageViewList.add(view);
-//        }
         for (int i = 0; i < imageUrl.size(); i++) {
             ImageView view = new ImageView(context);
             Glide.with(context)
@@ -233,20 +239,18 @@ public class LoopView extends FrameLayout {
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         switch (ev.getAction()) {
-            case MotionEvent.ACTION_DOWN: {
+            case MotionEvent.ACTION_DOWN:
                 getParent().requestDisallowInterceptTouchEvent(true);
-                onItemClickListener.ItemClickListener(ids.get(currentItem));
                 break;
-            }
             case MotionEvent.ACTION_MOVE:
 
                 break;
             case MotionEvent.ACTION_UP:
-
                 break;
         }
         return super.dispatchTouchEvent(ev);
     }
+
 
     private class LoopTask implements Runnable {
         @Override

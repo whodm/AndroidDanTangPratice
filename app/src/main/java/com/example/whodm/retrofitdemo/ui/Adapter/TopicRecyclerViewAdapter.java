@@ -25,7 +25,7 @@ import com.example.whodm.retrofitdemo.ui.model.SingleCover;
 import com.example.whodm.retrofitdemo.ui.model.TopicIcon;
 
 
-public class TopicRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class TopicRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements View.OnClickListener {
     //our items
     List<TopicIcon> items = new ArrayList<>();
     //headers
@@ -53,7 +53,9 @@ public class TopicRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == TYPE_ITEM) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.top_icon, parent, false);
-            return new ItemViewHolder(view);
+            ItemViewHolder viewHolder = new ItemViewHolder(view);
+            view.setOnClickListener(this);
+            return viewHolder;
         } else if (viewType == TYPE_HEADER) {
             FrameLayout frameLayout = new FrameLayout(parent.getContext());
             frameLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -86,15 +88,15 @@ public class TopicRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
                     .load(topicIcon.getUrl())
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(itemViewHolder.iv_cover);
-            if (onItemClickListener != null) {
-                itemViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        int pos = holder.getAdapterPosition() - headers.size();
-                        onItemClickListener.ItemClickListener(itemViewHolder.itemView, pos);
-                    }
-                });
-            }
+//            if (onItemClickListener != null) {
+//                itemViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        int pos = holder.getAdapterPosition() - headers.size();
+//                        onItemClickListener.ItemClickListener(itemViewHolder.itemView, pos);
+//                    }
+//                });
+//            }
             if (endlessLoadListener != null && position >= headers.size() + items.size() - 1) {
                 endlessLoadListener.loadMore();
             }
@@ -103,6 +105,11 @@ public class TopicRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
 
     public void setEndlessLoadListener(EndlessLoadListener endlessLoadListener) {
         this.endlessLoadListener = endlessLoadListener;
+    }
+
+    @Override
+    public void onClick(View v) {
+
     }
 
     public interface EndlessLoadListener {

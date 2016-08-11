@@ -4,8 +4,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -42,18 +44,28 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
     private ItemRecyclerViewAdapter itemRecyclerViewAdapter;
     private final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
     private int offset = 0;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_collection,container,false);
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler);
+        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refresh_collection);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setHasFixedSize(true);
         itemRecyclerViewAdapter = new ItemRecyclerViewAdapter(getActivity());
-        init();
         recyclerView.setAdapter(itemRecyclerViewAdapter);
+//        loopView.setOnItemClickListener(new LoopView.OnItemClickListener() {
+//            @Override
+//            public void ItemClickListener(int id) {
+//                Intent intent = new Intent(getActivity(),DetailActivity.class);
+//                intent.putExtra("ID",id);
+//                Log.d(TAG,"id = "+id+"");
+//                startActivity(intent);
+//            }
+//        });
         itemRecyclerViewAdapter.setEndlessLoadListener(new ItemRecyclerViewAdapter.EndlessLoadListener() {
             @Override
             public void loadMore() {
@@ -68,6 +80,7 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
                 startActivity(intent);
             }
         });
+        init();
         return view;
     }
 
@@ -82,20 +95,20 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
         List<Banner> imagesUrl = new ArrayList<>();
 
         for (int i = 0; i < bannerList.size(); i++) {
-//            imagesUrl.add(bannerList.get(i).getImage_url());
             Banner banner = new Banner();
             banner.setId(bannerList.get(i).getTarget_id());
             banner.setUrl(bannerList.get(i).getImage_url());
             imagesUrl.add(banner);
         }
-        LoopView loopView = new LoopView(getContext(), imagesUrl);
-        loopView.setOnItemClickListener(new LoopView.OnItemClickListener() {
+        LoopView loopView = new LoopView(getContext());
+        loopView.setImageUrl(imagesUrl);
+        itemRecyclerViewAdapter.addHeader(loopView);
+        recyclerView.post(new Runnable() {
             @Override
-            public void ItemClickListener(String id) {
-                Log.d(TAG, "id = " + id);
+            public void run() {
+                itemRecyclerViewAdapter.notifyDataSetChanged();
             }
         });
-        itemRecyclerViewAdapter.addHeader(loopView);
     }
 
     @Override
@@ -114,9 +127,9 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
         for (int i = 0; i < list.size(); i++) {
             ItemCover itemCover = new ItemCover();
             itemCover.setUrl(list.get(i).cover_image_url);
-            Log.d(TAG, itemCover.getUrl());
             itemCover.setTitle(list.get(i).title);
             itemCover.setLike(list.get(i).likes_count.toString());
+            Log.d(TAG, "url = " + list.get(i).content_url);
             itemCover.setContent_url(list.get(i).content_url);
             itemCoverList.add(itemCover);
         }

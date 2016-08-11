@@ -25,7 +25,7 @@ import com.example.whodm.retrofitdemo.ui.model.Icon;
 import com.example.whodm.retrofitdemo.ui.model.SingleCover;
 
 
-public class IconRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class IconRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements View.OnClickListener {
     //our items
     List<Icon> items = new ArrayList<>();
     //headers
@@ -87,6 +87,7 @@ public class IconRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
                     .load(icon.getUrl())
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(itemViewHolder.iv_cover);
+
 //            SingleCover singleCover = items.get(position - headers.size());
 //            itemViewHolder.tv_title.setText(singleCover.getTitle());
 //            itemViewHolder.tv_like.setText(singleCover.getLike());
@@ -95,19 +96,24 @@ public class IconRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
 //                    .load(singleCover.getUrl())
 //                    .diskCacheStrategy(DiskCacheStrategy.ALL)
 //                    .into(itemViewHolder.iv_cover);
-            if (onItemClickListener != null) {
-                itemViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        int pos = holder.getAdapterPosition() - headers.size();
-                        onItemClickListener.ItemClickListener(itemViewHolder.itemView, pos);
-                    }
-                });
-            }
+//            if (onItemClickListener != null) {
+//                itemViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        int pos = holder.getAdapterPosition() - headers.size();
+//                        onItemClickListener.ItemClickListener(itemViewHolder.itemView, pos);
+//                    }
+//                });
+//            }
             if (endlessLoadListener != null && position >= headers.size() + items.size() - 1) {
                 endlessLoadListener.loadMore();
             }
         }
+    }
+
+    @Override
+    public void onClick(View v) {
+        onItemClickListener.ItemClickListener(v, (String) v.getTag());
     }
 
     public void setEndlessLoadListener(EndlessLoadListener endlessLoadListener) {
@@ -119,7 +125,7 @@ public class IconRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     public interface OnItemClickListener {
-        void ItemClickListener(View view, int postion);
+        void ItemClickListener(View view, String url);
     }
 
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {

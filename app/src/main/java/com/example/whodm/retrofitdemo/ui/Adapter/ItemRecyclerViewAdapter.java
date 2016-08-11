@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * Created by whodm on 2016/7/9.
  */
-public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements View.OnClickListener {
     //our items
     List<ItemCover> items = new ArrayList<>();
     //headers
@@ -49,7 +49,9 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == TYPE_ITEM) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_layout, parent, false);
-            return new ItemViewHolder(view);
+            ItemViewHolder viewHolder = new ItemViewHolder(view);
+            view.setOnClickListener(this);
+            return viewHolder;
         } else if (viewType == TYPE_HEADER) {
             FrameLayout frameLayout = new FrameLayout(parent.getContext());
             frameLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -91,15 +93,7 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
                     .into(itemViewHolder.iv_cover);
             itemViewHolder.tv_title.setText(itemCover.getTitle());
             itemViewHolder.tv_like.setText(itemCover.getLike());
-            itemViewHolder.url = itemCover.getContent_url();
-            if (onItemClickListener != null) {
-                itemViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        onItemClickListener.ItemClickListener(itemViewHolder.itemView, itemViewHolder.url);
-                    }
-                });
-            }
+            holder.itemView.setTag(itemCover.getContent_url());
             if (endlessLoadListener != null && position >= headers.size() + items.size() - 1) {
                 endlessLoadListener.loadMore();
             }
@@ -107,8 +101,8 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     @Override
-    public void onViewRecycled(RecyclerView.ViewHolder holder) {
-        super.onViewRecycled(holder);
+    public void onClick(View v) {
+        onItemClickListener.ItemClickListener(v, (String) v.getTag());
     }
 
     public void setEndlessLoadListener(EndlessLoadListener endlessLoadListener) {
@@ -149,12 +143,11 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     public void addHeader(View header) {
-        if (!headers.contains(header)) {
-            headers.add(header);
-            //animate
-            notifyItemInserted(headers.size() - 1);
-            Log.d("addHeader", header + "");
-        }
+        headers.clear();
+        headers.add(header);
+        //animate
+        notifyItemInserted(headers.size() - 1);
+        Log.d("addHeader", header + "");
     }
 
 
@@ -180,7 +173,6 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
         private ImageView iv_cover;
         private TextView tv_title;
         private TextView tv_like;
-        private String url;
 
         public ItemViewHolder(View itemView) {
             super(itemView);

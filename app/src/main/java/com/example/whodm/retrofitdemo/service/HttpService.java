@@ -7,6 +7,7 @@ import com.example.whodm.retrofitdemo.callback.BannerCallback;
 import com.example.whodm.retrofitdemo.callback.ClassesCallback;
 import com.example.whodm.retrofitdemo.callback.IndexCallback;
 import com.example.whodm.retrofitdemo.callback.SingleCallback;
+import com.example.whodm.retrofitdemo.callback.TopicDataCallback;
 import com.example.whodm.retrofitdemo.model.all.AllData;
 import com.example.whodm.retrofitdemo.model.banners.BannerData;
 import com.example.whodm.retrofitdemo.model.banners.Banners;
@@ -109,7 +110,6 @@ public class HttpService {
         });
     }
     //专题列表数据 -> 专题详情
-    //通过获取id得到专题列表
     public void topDetailService(){
         Call<BaseModel<TopicDetailData>> call = api.defaultTopicDetail();
 
@@ -131,23 +131,25 @@ public class HttpService {
         });
     }
     //专题合集 -> 专题列表数据
-    public void topicService(int id, int offset) {
+    //通过获取id得到专题列表
+    public void topicService(int id, int offset, final TopicDataCallback callback) {
         Call<BaseModel<TopicData>> call = api.defaultTopic(id, offset);
 
         call.enqueue(new Callback<BaseModel<TopicData>>() {
             @Override
             public void onResponse(Response<BaseModel<TopicData>> response, Retrofit retrofit) {
                 if (response.body().data == null || response.body().data.posts.size() == 0) {
-                    Log.d("onRespone topic","Null");
+                    callback.onTopicDataNothing();
 
                 } else {
                     Log.d("onRespone topic",response.body().data.posts.toString());
+                    callback.onTopicDataSuccess(response.body().data);
                 }
             }
 
             @Override
             public void onFailure(Throwable t) {
-
+                callback.onTopicDataFail();
             }
         });
     }

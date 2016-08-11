@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.example.whodm.retrofitdemo.R;
 import com.example.whodm.retrofitdemo.callback.SingleCallback;
 import com.example.whodm.retrofitdemo.ui.WebViewActivity;
+import com.example.whodm.retrofitdemo.ui.model.ItemCover;
 import com.example.whodm.retrofitdemo.ui.model.SingleCover;
 import com.example.whodm.retrofitdemo.model.single.SingleData;
 import com.example.whodm.retrofitdemo.service.HttpService;
@@ -30,6 +31,7 @@ public class SingleFragment extends Fragment implements SingleCallback {
     private final static HttpService httpService = new HttpService();
     private RecyclerView recyclerView;
     private SingleRecyclerViewAdapter singleRecyclerViewAdapter;
+    private int offset = 0;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -48,7 +50,7 @@ public class SingleFragment extends Fragment implements SingleCallback {
         singleRecyclerViewAdapter.setEndlessLoadListener(new SingleRecyclerViewAdapter.EndlessLoadListener() {
             @Override
             public void loadMore() {
-
+                onUpdate();
             }
         });
         singleRecyclerViewAdapter.setOnItemClickListener(new SingleRecyclerViewAdapter.OnItemClickListener() {
@@ -64,8 +66,13 @@ public class SingleFragment extends Fragment implements SingleCallback {
         return view;
     }
 
+    public void onUpdate() {
+        offset = offset + 20;
+        httpService.singleService(offset, this);
+    }
+
     public void init() {
-        httpService.singleService(0, this);
+        httpService.singleService(offset, this);
     }
 
     @Override
@@ -82,6 +89,13 @@ public class SingleFragment extends Fragment implements SingleCallback {
             itemCoverList.add(singleCover);
         }
         singleRecyclerViewAdapter.addItem(itemCoverList);
+
+        recyclerView.post(new Runnable() {
+            @Override
+            public void run() {
+                singleRecyclerViewAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     @Override

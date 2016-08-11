@@ -5,7 +5,7 @@ package com.example.whodm.retrofitdemo.ui.model;
  */
 public class Banner {
     private String url;
-    private String id;
+    private int id;
 
     public String getUrl() {
         return url;
@@ -15,11 +15,11 @@ public class Banner {
         this.url = url;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 }
