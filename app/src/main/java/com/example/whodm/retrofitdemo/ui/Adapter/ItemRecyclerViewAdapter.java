@@ -25,16 +25,13 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
     //our items
     List<ItemCover> items = new ArrayList<>();
     //headers
-    List<View> headers = new ArrayList<>();
-    //footers
-    List<View> footers = new ArrayList<>();
+    private View header;
 
     private ItemViewHolder itemViewHolder;
 
     private Context context;
 
     public static final int TYPE_HEADER = 111;
-    public static final int TYPE_FOOTER = 222;
     public static final int TYPE_ITEM = 333;
 
     private EndlessLoadListener endlessLoadListener;
@@ -45,47 +42,43 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
         this.context = context;
     }
 
+    public View getHeader() {
+        return header;
+    }
+
+    public void setHeader(View header) {
+        this.header = null;
+        this.header = header;
+        notifyItemInserted(0);
+    }
+
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        if (viewType == TYPE_ITEM) {
+        if (header != null && viewType == TYPE_HEADER) {
+            return new HeaderViewHolder(header);
+        } else {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_layout, parent, false);
             ItemViewHolder viewHolder = new ItemViewHolder(view);
             view.setOnClickListener(this);
             return viewHolder;
-        } else if (viewType == TYPE_HEADER) {
-            FrameLayout frameLayout = new FrameLayout(parent.getContext());
-            frameLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-            return new HeaderViewHolder(frameLayout);
-        } else {
-            FrameLayout frameLayout = new FrameLayout(parent.getContext());
-            frameLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-            return new FooterViewHolder(frameLayout);
         }
     }
 
 
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
-        Log.d("Position", position + "");
-        if (position < headers.size()) {
-            HeaderViewHolder headerViewHolder = (HeaderViewHolder) holder;
-//            View view = headers.get(position);
-            View view = headers.get(position);
-            if (headerViewHolder.frameLayout.getChildCount() == 0) {
-                headerViewHolder.frameLayout.addView(view);
-            } else {
-                headerViewHolder.frameLayout.removeAllViews();
-                headerViewHolder.frameLayout.addView(view);
-            }
+        if (getItemViewType(position) == TYPE_HEADER) {
 
-        } else if (position >= headers.size() + items.size()) {
-            FooterViewHolder footerViewHolder = (FooterViewHolder) holder;
-            View view = footers.get(position - headers.size() - items.size());
-            footerViewHolder.frameLayout.removeAllViews();
-            footerViewHolder.frameLayout.addView(view);
-        } else {
+        } else if (getItemViewType(position) == TYPE_ITEM) {
             itemViewHolder = (ItemViewHolder) holder;
-            ItemCover itemCover = items.get(position - headers.size());
+            int realPosition;
+            if (header != null) {
+                realPosition = position - 1;
+            } else {
+                realPosition = position;
+            }
+            ItemCover itemCover = items.get(realPosition);
+            Log.d("Item", realPosition + "");
             Glide.with(context)
                     .load(itemCover.getUrl())
                     .placeholder(R.drawable.loading)
@@ -94,7 +87,7 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
             itemViewHolder.tv_title.setText(itemCover.getTitle());
             itemViewHolder.tv_like.setText(itemCover.getLike());
             holder.itemView.setTag(itemCover.getContent_url());
-            if (endlessLoadListener != null && position >= headers.size() + items.size() - 1) {
+            if (endlessLoadListener != null && realPosition >= items.size() - 1) {
                 endlessLoadListener.loadMore();
             }
         }
@@ -123,49 +116,41 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     @Override
     public int getItemCount() {
-        return headers.size() + footers.size() + items.size();
+        if (header == null) {
+            return items.size();
+        } else {
+            return items.size() + 1;
+        }
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (position < headers.size()) {
-            return TYPE_HEADER;
-        } else if (position >= items.size() + headers.size()) {
-            return TYPE_FOOTER;
-        } else {
+        if (header == null) {
+
             return TYPE_ITEM;
         }
+        if (position == 0) {
+
+            return TYPE_HEADER;
+        }
+        return TYPE_ITEM;
     }
 
     public void addItem(List<ItemCover> list) {
+        if (header != null) {
+            items.addAll(list);
+            notifyItemInserted(items.size());
+        }
         items.addAll(list);
-        notifyItemInserted(headers.size() + items.size() - 1);
-    }
-
-    public void addHeader(View header) {
-        headers.clear();
-        headers.add(header);
-        //animate
-        notifyItemInserted(headers.size() - 1);
-        Log.d("addHeader", header + "");
+        notifyItemInserted(items.size() - 1);
     }
 
 
-    public static class HeaderViewHolder extends RecyclerView.ViewHolder {
-        private FrameLayout frameLayout;
+    public class HeaderViewHolder extends RecyclerView.ViewHolder {
 
         public HeaderViewHolder(View itemView) {
             super(itemView);
-            this.frameLayout = (FrameLayout) itemView;
-        }
-    }
-
-    public static class FooterViewHolder extends RecyclerView.ViewHolder {
-        private FrameLayout frameLayout;
-
-        public FooterViewHolder(View itemView) {
-            super(itemView);
-            this.frameLayout = (FrameLayout) itemView;
+            itemView = header;
         }
     }
 

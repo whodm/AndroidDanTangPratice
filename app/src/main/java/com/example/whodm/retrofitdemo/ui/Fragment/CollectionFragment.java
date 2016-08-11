@@ -45,6 +45,7 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
     private final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
     private int offset = 0;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private LoopView loopView;
 
     @Nullable
     @Override
@@ -57,15 +58,16 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
         recyclerView.setHasFixedSize(true);
         itemRecyclerViewAdapter = new ItemRecyclerViewAdapter(getActivity());
         recyclerView.setAdapter(itemRecyclerViewAdapter);
-//        loopView.setOnItemClickListener(new LoopView.OnItemClickListener() {
-//            @Override
-//            public void ItemClickListener(int id) {
-//                Intent intent = new Intent(getActivity(),DetailActivity.class);
-//                intent.putExtra("ID",id);
-//                Log.d(TAG,"id = "+id+"");
-//                startActivity(intent);
-//            }
-//        });
+        loopView = new LoopView(getContext());
+        loopView.setOnItemClickListener(new LoopView.OnItemClickListener() {
+            @Override
+            public void ItemClickListener(int id) {
+                Intent intent = new Intent(getActivity(), DetailActivity.class);
+                intent.putExtra("ID", id);
+                Log.d(TAG, "id = " + id + "");
+                startActivity(intent);
+            }
+        });
         itemRecyclerViewAdapter.setEndlessLoadListener(new ItemRecyclerViewAdapter.EndlessLoadListener() {
             @Override
             public void loadMore() {
@@ -100,15 +102,8 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
             banner.setUrl(bannerList.get(i).getImage_url());
             imagesUrl.add(banner);
         }
-        LoopView loopView = new LoopView(getContext());
         loopView.setImageUrl(imagesUrl);
-        itemRecyclerViewAdapter.addHeader(loopView);
-        recyclerView.post(new Runnable() {
-            @Override
-            public void run() {
-                itemRecyclerViewAdapter.notifyDataSetChanged();
-            }
-        });
+        itemRecyclerViewAdapter.setHeader(loopView);
     }
 
     @Override

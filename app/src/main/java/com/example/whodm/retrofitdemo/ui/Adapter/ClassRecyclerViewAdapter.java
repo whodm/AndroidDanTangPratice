@@ -1,17 +1,17 @@
 package com.example.whodm.retrofitdemo.ui.Adapter;
 
 import android.content.Context;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.whodm.retrofitdemo.R;
+import com.example.whodm.retrofitdemo.ui.MyGridView;
 import com.example.whodm.retrofitdemo.ui.model.Icon;
+import com.example.whodm.retrofitdemo.ui.model.TopicIcon;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,118 +22,70 @@ import java.util.List;
 public class ClassRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements View.OnClickListener {
     private Context context;
 
-    private static final int TEXT = 1111;
+    private static final int TOPICICON = 1111;
+    private static final int STYLE = 2222;
+    private static final int PINLEI = 3333;
 
-    private static final int TOPICICON = 2222;
+    private LinearLayoutManager horizontalManager;
 
-    private static final int ICON = 3333;
+    private List<Icon> icons = new ArrayList<>();
 
-    private List<String> textList = new ArrayList<>();
+    private List<String> stringList = new ArrayList<>();
 
-    private List<View> topList = new ArrayList<>();
+    private List<TopicIcon> topList = new ArrayList<>();
 
     private List<Icon> iconList = new ArrayList<>();
 
-    private OnItemClickListener onItemClickListener;
-
-    private int counter = 0;
-
-    public interface OnItemClickListener {
-        void ItemClickListener(View view, String url);
-    }
 
     public ClassRecyclerViewAdapter(Context context) {
         this.context = context;
+        horizontalManager = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        if (viewType == TEXT) {
-            View view = LayoutInflater.from(context).inflate(R.layout.type_text, parent, false);
-            TextHolder textHolder = new TextHolder(view);
-            return textHolder;
-        } else if (viewType == TOPICICON) {
+        if (viewType == TOPICICON) {
             View view = LayoutInflater.from(context).inflate(R.layout.type_topic, parent, false);
-            TopicHolder topicHolder = new TopicHolder(view);
-            return topicHolder;
+            TopicHolder viewHolder = new TopicHolder(view);
+            return viewHolder;
+        } else if (viewType == STYLE) {
+            View view = LayoutInflater.from(context).inflate(R.layout.type_first_group, parent, false);
+            IconHolder viewHolder = new IconHolder(view);
+            return viewHolder;
         } else {
-            View view = LayoutInflater.from(context).inflate(R.layout.type_icon, parent, false);
-            IconHolder iconHolder = new IconHolder(view);
-            return iconHolder;
+            View view = LayoutInflater.from(context).inflate(R.layout.type_second_group, parent, false);
+            PinLeiHolder viewHolder = new PinLeiHolder(view);
+            return viewHolder;
         }
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        if (position == 0 || position == 2 || position == 4) {
-            TextHolder textHolder = (TextHolder) holder;
-            switch (position) {
-                case 0:
-                    textHolder.tv_type_text.setText(textList.get(0));
-                    break;
-                case 2:
-                    textHolder.tv_type_text.setText(textList.get(1));
-                    break;
-                case 4:
-                    textHolder.tv_type_text.setText(textList.get(2));
-                    break;
-            }
-        } else if (position == 1) {
+        if (getItemViewType(position) == TOPICICON) {
             TopicHolder topicHolder = (TopicHolder) holder;
-
-        } else {
+            topicHolder.recyclerView.setLayoutManager(horizontalManager);
+            topicHolder.recyclerView.setAdapter(new ClassInnerRecyclerViewAdapter(context, topList));
+        } else if (getItemViewType(position) == STYLE) {
             IconHolder iconHolder = (IconHolder) holder;
-            for (int i = counter; i < counter + 4; i++) {
-                intoImageView(iconHolder, i);
-            }
-            counter = counter + 4;
+            iconHolder.gridView.setAdapter(new GridViewAdapter(context, iconList));
+        } else if (getItemViewType(position) == PINLEI) {
+            PinLeiHolder pinLeiHolder = (PinLeiHolder) holder;
+            pinLeiHolder.gridView.setAdapter(new GridViewAdapter(context, icons));
         }
     }
 
-
-    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
-        this.onItemClickListener = onItemClickListener;
-    }
 
     @Override
     public int getItemCount() {
-        return textList.size() + topList.size() + iconList.size();
+        return 3;
     }
 
-    public void intoImageView(IconHolder iconHolder, int i) {
-        switch (i) {
-            case 0:
-                Glide.with(context)
-                        .load(iconList.get(i).getUrl())
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .into(iconHolder.iv_1);
-                break;
-            case 1:
-                Glide.with(context)
-                        .load(iconList.get(i).getUrl())
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .into(iconHolder.iv_2);
-                break;
-            case 2:
-                Glide.with(context)
-                        .load(iconList.get(i).getUrl())
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .into(iconHolder.iv_3);
-                break;
-            case 3:
-                Glide.with(context)
-                        .load(iconList.get(i).getUrl())
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .into(iconHolder.iv_4);
-                break;
-        }
+
+    public List<TopicIcon> getTopList() {
+        return topList;
     }
 
-    public void setTextList(List<String> textList) {
-        this.textList = textList;
-    }
-
-    public void setTopList(List<View> topList) {
+    public void setTopList(List<TopicIcon> topList) {
         this.topList = topList;
     }
 
@@ -141,12 +93,20 @@ public class ClassRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
         this.iconList = iconList;
     }
 
-    public List<String> getTextList() {
-        return textList;
+    public List<Icon> getIcons() {
+        return icons;
     }
 
-    public List<View> getTopList() {
-        return topList;
+    public List<String> getStringList() {
+        return stringList;
+    }
+
+    public void setStringList(List<String> stringList) {
+        this.stringList = stringList;
+    }
+
+    public void setIcons(List<Icon> icons) {
+        this.icons = icons;
     }
 
     public List<Icon> getIconList() {
@@ -155,13 +115,14 @@ public class ClassRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
 
     @Override
     public int getItemViewType(int position) {
-        if (position == 0 || position == 2 || position == 4) {
-            return TEXT;
-        } else if (position == 1) {
+        if (position == 0) {
             return TOPICICON;
-        } else {
-            return ICON;
+        } else if (position == 1) {
+            return STYLE;
+        } else if (position == 2) {
+            return PINLEI;
         }
+        return position;
     }
 
     @Override
@@ -169,24 +130,21 @@ public class ClassRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
 
     }
 
-    private class TextHolder extends RecyclerView.ViewHolder {
-        private TextView tv_type_text;
+    private class PinLeiHolder extends RecyclerView.ViewHolder {
+        private MyGridView gridView;
 
-        public TextHolder(View itemView) {
+        public PinLeiHolder(View itemView) {
             super(itemView);
-            tv_type_text = (TextView) itemView.findViewById(R.id.tv_type_text);
+            gridView = (MyGridView) itemView.findViewById(R.id.gridview_second);
         }
     }
 
     private class IconHolder extends RecyclerView.ViewHolder {
-        private ImageView iv_1, iv_2, iv_3, iv_4;
+        private MyGridView gridView;
 
         public IconHolder(View itemView) {
             super(itemView);
-            iv_1 = (ImageView) itemView.findViewById(R.id.type_iv_1);
-            iv_2 = (ImageView) itemView.findViewById(R.id.type_iv_2);
-            iv_3 = (ImageView) itemView.findViewById(R.id.type_iv_3);
-            iv_4 = (ImageView) itemView.findViewById(R.id.type_iv_4);
+            gridView = (MyGridView) itemView.findViewById(R.id.gridview_first);
 
         }
     }

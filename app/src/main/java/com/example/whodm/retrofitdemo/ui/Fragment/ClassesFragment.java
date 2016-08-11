@@ -29,6 +29,8 @@ import com.example.whodm.retrofitdemo.model.bottomstyle.BottomStyleData;
 import com.example.whodm.retrofitdemo.model.bottomstyle.Channel;
 import com.example.whodm.retrofitdemo.model.single.SingleData;
 import com.example.whodm.retrofitdemo.service.HttpService;
+import com.example.whodm.retrofitdemo.ui.Adapter.ClassInnerRecyclerViewAdapter;
+import com.example.whodm.retrofitdemo.ui.Adapter.ClassRecyclerViewAdapter;
 import com.example.whodm.retrofitdemo.ui.Adapter.GridViewAdapter;
 import com.example.whodm.retrofitdemo.ui.Adapter.IconRecyclerViewAdapter;
 import com.example.whodm.retrofitdemo.ui.Adapter.SingleRecyclerViewAdapter;
@@ -45,15 +47,18 @@ import java.util.List;
  */
 public class ClassesFragment extends Fragment implements ClassesCallback, AllTopicCallback {
     private static String TAG = "ClassesFragment";
-    private RecyclerView topicRecyclerView, styleRecyclerView, pinleiRecyclerView;
-    private GridView gridView;
-    private IconRecyclerViewAdapter styleRecyclerViewAdapter;
-    private IconRecyclerViewAdapter pinleiRecyclerViewAdapter;
-    //private TopicRecyclerViewAdapter topicRecyclerViewAdapter;
+    private RecyclerView recyclerView;
+    //    private RecyclerView topicRecyclerView, styleRecyclerView, pinleiRecyclerView;
+//    private GridView gridView;
+//    private IconRecyclerViewAdapter styleRecyclerViewAdapter;
+//    private IconRecyclerViewAdapter pinleiRecyclerViewAdapter;
+//    //private TopicRecyclerViewAdapter topicRecyclerViewAdapter;
+    private ClassRecyclerViewAdapter classRecyclerViewAdapter;
     private final static HttpService httpService = new HttpService();
     private List<TopicIcon> topicIcons = new ArrayList<>();
     private List<Icon> iconList_one = new ArrayList<>();
     private List<Icon> iconList_second = new ArrayList<>();
+    private final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
     private final LinearLayoutManager horizontalManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -63,23 +68,29 @@ public class ClassesFragment extends Fragment implements ClassesCallback, AllTop
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_class,container,false);
-        topicRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_topic);
-        styleRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_style);
-//        pinleiRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_pinlei);
-        //container_one = (FrameLayout) view.findViewById(R.id.container_one);
-        gridView = (GridView) view.findViewById(R.id.gridview);
-        gridView.setOnTouchListener(new View.OnTouchListener() {
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_MOVE) {
-                    return true;
-                }
-                return false;
-            }
-        });
-        initRecycleView();
+        View view = inflater.inflate(R.layout.fragment_class_v1, container, false);
+        recyclerView = (RecyclerView) view.findViewById(R.id.recycler_class);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setHasFixedSize(true);
+        classRecyclerViewAdapter = new ClassRecyclerViewAdapter(getActivity());
+        recyclerView.setAdapter(classRecyclerViewAdapter);
+//        topicRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_topic);
+//        styleRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_style);
+////        pinleiRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_pinlei);
+//        //container_one = (FrameLayout) view.findViewById(R.id.container_one);
+//        gridView = (GridView) view.findViewById(R.id.gridview);
+//        gridView.setOnTouchListener(new View.OnTouchListener() {
+//
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                if (event.getAction() == MotionEvent.ACTION_MOVE) {
+//                    return true;
+//                }
+//                return false;
+//            }
+//        });
+//        initRecycleView();
         Log.d(TAG, "RUN");
         init();
         return view;
@@ -97,9 +108,15 @@ public class ClassesFragment extends Fragment implements ClassesCallback, AllTop
             TopicIcon topicIcon = new TopicIcon();
             topicIcon.setUrl(allData.collections.get(i).getBanner_image_url());
             topicIcon.setContent_url(allData.collections.get(i).getId().toString());
-            Log.d("Claases", topicIcon.getUrl());
             topicIcons.add(topicIcon);
         }
+        classRecyclerViewAdapter.setTopList(topicIcons);
+        recyclerView.post(new Runnable() {
+            @Override
+            public void run() {
+                classRecyclerViewAdapter.notifyDataSetChanged();
+            }
+        });
 //        topicRecyclerViewAdapter.addItem(topicIcons);
 //        topicRecyclerViewAdapter.setEndlessLoadListener(new TopicRecyclerViewAdapter.EndlessLoadListener() {
 //            @Override
@@ -151,9 +168,17 @@ public class ClassesFragment extends Fragment implements ClassesCallback, AllTop
                 }
             }
         }
-        gridView.setAdapter(new GridViewAdapter(getActivity(), iconList_second));
-        styleRecyclerViewAdapter.addItem(iconList_one);
-        styleRecyclerView.setAdapter(styleRecyclerViewAdapter);
+        classRecyclerViewAdapter.setIconList(iconList_one);
+        classRecyclerViewAdapter.setIcons(iconList_second);
+        recyclerView.post(new Runnable() {
+            @Override
+            public void run() {
+                classRecyclerViewAdapter.notifyDataSetChanged();
+            }
+        });
+//        gridView.setAdapter(new GridViewAdapter(getActivity(), iconList_second));
+//        styleRecyclerViewAdapter.addItem(iconList_one);
+//        styleRecyclerView.setAdapter(styleRecyclerViewAdapter);
     }
 
     @Override
@@ -162,13 +187,13 @@ public class ClassesFragment extends Fragment implements ClassesCallback, AllTop
     }
 
     public void initRecycleView() {
-        topicRecyclerView.setLayoutManager(horizontalManager);
-        styleRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL));
-        topicRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        topicRecyclerView.setHasFixedSize(true);
-        styleRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        styleRecyclerView.setHasFixedSize(true);
-        styleRecyclerViewAdapter = new IconRecyclerViewAdapter(getActivity());
-//        topicRecyclerViewAdapter = new TopicRecyclerViewAdapter(getActivity());
+//        topicRecyclerView.setLayoutManager(horizontalManager);
+//        styleRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL));
+//        topicRecyclerView.setItemAnimator(new DefaultItemAnimator());
+//        topicRecyclerView.setHasFixedSize(true);
+//        styleRecyclerView.setItemAnimator(new DefaultItemAnimator());
+//        styleRecyclerView.setHasFixedSize(true);
+//        styleRecyclerViewAdapter = new IconRecyclerViewAdapter(getActivity());
+////        topicRecyclerViewAdapter = new TopicRecyclerViewAdapter(getActivity());
     }
 }

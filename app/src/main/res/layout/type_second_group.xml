@@ -6,14 +6,20 @@
     android:layout_height="wrap_content">
 
     <TextView
-        android:text="专题合集"
+        android:text="品类"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:layout_margin="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recycler_type_topic"
-        android:layout_width="wrap_content"
-        android:layout_height="80dp" />
+    <com.example.whodm.retrofitdemo.ui.MyGridView
+        android:id="@+id/gridview_second"
+        android:columnWidth="80dp"
+        android:numColumns="4"
+        android:verticalSpacing="10dp"
+        android:horizontalSpacing="10dp"
+        android:stretchMode="columnWidth"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 </LinearLayout>

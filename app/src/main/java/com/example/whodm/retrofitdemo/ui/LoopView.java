@@ -62,7 +62,6 @@ public class LoopView extends FrameLayout implements View.OnClickListener {
     public LoopView(Context context) {
         super(context);
         this.content = context;
-        setOnClickListener(this);
     }
 
     public interface OnItemClickListener {
@@ -133,6 +132,7 @@ public class LoopView extends FrameLayout implements View.OnClickListener {
         viewPager.setFocusable(true);
         viewPager.setAdapter(new MyPagerAdapter());
         viewPager.setOnPageChangeListener(new MyPageChangeListener());
+        viewPager.setOnClickListener(this);
     }
 
 
