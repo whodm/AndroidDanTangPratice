@@ -85,6 +85,7 @@ public class SingleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
             Glide.with(context)
                     .load(singleCover.getUrl())
                     .placeholder(R.drawable.loading_single)
+                    .centerCrop()
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(itemViewHolder.iv_cover);
             if (endlessLoadListener != null && realPosition >= items.size() - 1) {
@@ -146,14 +147,28 @@ public class SingleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
         return TYPE_ITEM;
     }
 
+    public void clearItems() {
+        int size = getItemCount();
+        this.items.clear();
+        this.header = null;
+        notifyDataSetChanged();
+//        if (header == null){
+//            notifyItemRangeRemoved(1,size);
+//        }
+//        notifyItemRangeRemoved(0,size);
+    }
+
+
     public void addItem(List<SingleCover> list) {
-        if (header != null) {
-            items.addAll(list);
-            notifyItemInserted(items.size());
-        }
+//        if (header != null) {
+//            items.addAll(list);
+//            notifyItemInserted(items.size());
+//        }
+//        items.addAll(list);
+//        Log.d("SingleRecycle", items.get(0).getTitle() + "");
+//        notifyItemInserted(items.size() - 1);
         items.addAll(list);
-        Log.d("SingleRecycle", items.get(0).getTitle() + "");
-        notifyItemInserted(items.size() - 1);
+        notifyDataSetChanged();
     }
 
 

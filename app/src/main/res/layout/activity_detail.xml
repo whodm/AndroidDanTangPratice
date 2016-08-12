@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.example.whodm.retrofitdemo.ui.DetailActivity">
+    tools:context=".ui.DetailTopicActivity">
 
     <android.support.v7.widget.Toolbar
         android:background="@color/colorPrimary"

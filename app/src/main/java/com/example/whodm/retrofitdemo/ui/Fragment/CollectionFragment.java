@@ -2,9 +2,6 @@ package com.example.whodm.retrofitdemo.ui.Fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -20,7 +17,7 @@ import android.widget.Toast;
 import com.example.whodm.retrofitdemo.callback.BannerCallback;
 import com.example.whodm.retrofitdemo.R;
 import com.example.whodm.retrofitdemo.callback.IndexCallback;
-import com.example.whodm.retrofitdemo.ui.DetailActivity;
+import com.example.whodm.retrofitdemo.ui.DetailTopicActivity;
 import com.example.whodm.retrofitdemo.ui.WebViewActivity;
 import com.example.whodm.retrofitdemo.ui.model.Banner;
 import com.example.whodm.retrofitdemo.ui.model.ItemCover;
@@ -46,6 +43,7 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
     private int offset = 0;
     private SwipeRefreshLayout swipeRefreshLayout;
     private LoopView loopView;
+    private int time;
 
     @Nullable
     @Override
@@ -59,19 +57,20 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
         itemRecyclerViewAdapter = new ItemRecyclerViewAdapter(getActivity());
         recyclerView.setAdapter(itemRecyclerViewAdapter);
         loopView = new LoopView(getContext());
-        loopView.setOnItemClickListener(new LoopView.OnItemClickListener() {
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
-            public void ItemClickListener(int id) {
-                Intent intent = new Intent(getActivity(), DetailActivity.class);
-                intent.putExtra("ID", id);
-                Log.d(TAG, "id = " + id + "");
-                startActivity(intent);
+            public void onRefresh() {
+                offset = 0;
+                itemRecyclerViewAdapter.clearItems();
+                init();
+                swipeRefreshLayout.setRefreshing(false);
             }
         });
         itemRecyclerViewAdapter.setEndlessLoadListener(new ItemRecyclerViewAdapter.EndlessLoadListener() {
             @Override
             public void loadMore() {
                 onUpdate();
+
             }
         });
         itemRecyclerViewAdapter.setOnItemClickListener(new ItemRecyclerViewAdapter.OnItemClickListener() {
@@ -91,11 +90,9 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
         httpservice.indexService(COLLECTION, offset, this);
     }
 
-
     @Override
     public void onBannerSuccess(List<Banners> bannerList) {
         List<Banner> imagesUrl = new ArrayList<>();
-
         for (int i = 0; i < bannerList.size(); i++) {
             Banner banner = new Banner();
             banner.setId(bannerList.get(i).getTarget_id());
@@ -104,6 +101,12 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
         }
         loopView.setImageUrl(imagesUrl);
         itemRecyclerViewAdapter.setHeader(loopView);
+//        recyclerView.post(new Runnable() {
+//            @Override
+//            public void run() {
+//                itemRecyclerViewAdapter.notifyItemChanged(0);
+//            }
+//        });
     }
 
     @Override
@@ -117,24 +120,27 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
     }
 
     @Override
-    public void onIndexSuccess(List<Item> list) {
+    public void onIndexSuccess(final List<Item> list) {
         List<ItemCover> itemCoverList = new ArrayList<>();
         for (int i = 0; i < list.size(); i++) {
             ItemCover itemCover = new ItemCover();
             itemCover.setUrl(list.get(i).cover_image_url);
             itemCover.setTitle(list.get(i).title);
             itemCover.setLike(list.get(i).likes_count.toString());
-            Log.d(TAG, "url = " + list.get(i).content_url);
+            Log.d(TAG, "num = " + i + "");
             itemCover.setContent_url(list.get(i).content_url);
             itemCoverList.add(itemCover);
         }
+        time = time + 1;
+        Log.d(TAG, "connect =" + time);
         itemRecyclerViewAdapter.addItem(itemCoverList);
-        recyclerView.post(new Runnable() {
-            @Override
-            public void run() {
-                itemRecyclerViewAdapter.notifyDataSetChanged();
-            }
-        });
+//        recyclerView.setAdapter(itemRecyclerViewAdapter);
+//        recyclerView.post(new Runnable() {
+//            @Override
+//            public void run() {
+//                itemRecyclerViewAdapter.notifyItemRangeChanged(offset + 1,list.size());
+//            }
+//        });
     }
 
     @Override

@@ -4,8 +4,10 @@ import android.util.Log;
 
 import com.example.whodm.retrofitdemo.callback.AllTopicCallback;
 import com.example.whodm.retrofitdemo.callback.BannerCallback;
+import com.example.whodm.retrofitdemo.callback.ChannelCallback;
 import com.example.whodm.retrofitdemo.callback.ClassesCallback;
 import com.example.whodm.retrofitdemo.callback.IndexCallback;
+import com.example.whodm.retrofitdemo.callback.SearchDataCallback;
 import com.example.whodm.retrofitdemo.callback.SingleCallback;
 import com.example.whodm.retrofitdemo.callback.TopicDataCallback;
 import com.example.whodm.retrofitdemo.model.all.AllData;
@@ -69,23 +71,20 @@ public class HttpService {
         });
     }
     //分类界面 风格品类 点击按钮
-    public void chanelService(int i){
-        Call<BaseModel<ChannelData>> call = api.defaultChannelData(i);
-
+    public void channelService(String id, int i, final ChannelCallback callback) {
+        final Call<BaseModel<ChannelData>> call = api.defaultChannelData(id, i);
         call.enqueue(new Callback<BaseModel<ChannelData>>() {
             @Override
             public void onResponse(Response<BaseModel<ChannelData>> response, Retrofit retrofit) {
                 if (response.body().data == null || response.body().data.items.size() == 0) {
-                    Log.d("onRespone channel","Null");
-
+                    callback.onChannelNothing();
                 } else {
-                    Log.d("onRespone channel",response.body().data.items.toString());
+                    callback.onChannelSuccess(response.body().data);
                 }
             }
-
             @Override
             public void onFailure(Throwable t) {
-
+                callback.onChannelFail();
             }
         });
     }
@@ -132,7 +131,7 @@ public class HttpService {
     }
     //专题合集 -> 专题列表数据
     //通过获取id得到专题列表
-    public void topicService(int id, int offset, final TopicDataCallback callback) {
+    public void topicService(String id, int offset, final TopicDataCallback callback) {
         Call<BaseModel<TopicData>> call = api.defaultTopic(id, offset);
 
         call.enqueue(new Callback<BaseModel<TopicData>>() {
@@ -176,7 +175,7 @@ public class HttpService {
         });
     }
     //根据搜索条件进行搜索
-    public void searchService(String s){
+    public void searchService(String s, final SearchDataCallback callback) {
         Call<BaseModel<SearchData>> call = api.defaultKeyWord(s);
 
         call.enqueue(new Callback<BaseModel<SearchData>>() {
@@ -184,15 +183,16 @@ public class HttpService {
             public void onResponse(Response<BaseModel<SearchData>> response, Retrofit retrofit) {
                 if (response.body().data == null || response.body().data.items.size() == 0) {
                     Log.d("onRespone search","Null");
-
+                    callback.onSeachNoting();
                 } else {
                     Log.d("onRespone search",response.body().data.items.toString());
+                    callback.onSeachSuccess(response.body().data);
                 }
             }
 
             @Override
             public void onFailure(Throwable t) {
-
+                callback.onSeachFail();
             }
         });
     }

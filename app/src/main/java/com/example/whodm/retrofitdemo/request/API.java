@@ -66,7 +66,7 @@ public interface API {
     //专题合集 -> 专题列表数据
     @GET("v1/collections/{id}/posts?gender=1&generation=1&limit=20")
     Call<BaseModel<TopicData>> defaultTopic(
-            @Path("id") int id,
+            @Path("id") String id,
             @Query("offset") int pageOffset
     );
 
@@ -79,8 +79,9 @@ public interface API {
     Call<BaseModel<BottomStyleData>> defaultChannel_Group();
 
     //分类界面 风格品类 点击按钮
-    @GET("v1/channels/12/items?limit=20")
+    @GET("v1/channels/{id}/items?limit=20")
     Call<BaseModel<ChannelData>> defaultChannelData(
+            @Path("id") String id,
             @Query("offset") int pageOffset
     );
 

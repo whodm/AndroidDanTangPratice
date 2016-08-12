@@ -11,9 +11,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.whodm.retrofitdemo.R;
-import com.example.whodm.retrofitdemo.callback.IndexCallback;
+import com.example.whodm.retrofitdemo.callback.ChannelCallback;
 import com.example.whodm.retrofitdemo.callback.TopicDataCallback;
-import com.example.whodm.retrofitdemo.model.index.Item;
+import com.example.whodm.retrofitdemo.model.channel.ChannelData;
+import com.example.whodm.retrofitdemo.model.channel.Item;
 import com.example.whodm.retrofitdemo.model.topic.Post;
 import com.example.whodm.retrofitdemo.model.topic.TopicData;
 import com.example.whodm.retrofitdemo.service.HttpService;
@@ -23,12 +24,11 @@ import com.example.whodm.retrofitdemo.ui.model.ItemCover;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DetailActivity extends AppCompatActivity implements TopicDataCallback {
+public class DetailTopicActivity extends AppCompatActivity implements TopicDataCallback {
     private RecyclerView recyclerView;
     private ItemRecyclerViewAdapter itemRecyclerViewAdapter;
     private final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
     private int offset = 0;
-    private int id;
     private TextView tv_detail;
     private TextView tv_back;
     private final static HttpService httpService = new HttpService();
@@ -37,19 +37,14 @@ public class DetailActivity extends AppCompatActivity implements TopicDataCallba
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
-        Intent i = getIntent();
-        id = i.getIntExtra("ID", 4);
         findById();
-        init(id);
+        Intent i = getIntent();
+        String id = i.getStringExtra("ID");
+        initID(id);
     }
 
-    public void init(final int i) {
+    public void initID(final String i) {
         httpService.topicService(i, offset, this);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setHasFixedSize(true);
-        itemRecyclerViewAdapter = new ItemRecyclerViewAdapter(this);
-        recyclerView.setAdapter(itemRecyclerViewAdapter);
         itemRecyclerViewAdapter.setEndlessLoadListener(new ItemRecyclerViewAdapter.EndlessLoadListener() {
             @Override
             public void loadMore() {
@@ -59,7 +54,7 @@ public class DetailActivity extends AppCompatActivity implements TopicDataCallba
         itemRecyclerViewAdapter.setOnItemClickListener(new ItemRecyclerViewAdapter.OnItemClickListener() {
             @Override
             public void ItemClickListener(View view, String url) {
-                Intent intent = new Intent(DetailActivity.this, WebViewActivity.class);
+                Intent intent = new Intent(DetailTopicActivity.this, WebViewActivity.class);
                 intent.putExtra("URL", url);
                 startActivity(intent);
             }
@@ -70,9 +65,20 @@ public class DetailActivity extends AppCompatActivity implements TopicDataCallba
         recyclerView = (RecyclerView) findViewById(R.id.recycler_detail);
         tv_detail = (TextView) findViewById(R.id.tv_topic_detail);
         tv_back = (TextView) findViewById(R.id.tv_back_detail);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setHasFixedSize(true);
+        itemRecyclerViewAdapter = new ItemRecyclerViewAdapter(this);
+        recyclerView.setAdapter(itemRecyclerViewAdapter);
+        tv_back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
-    public void onUpdate(int i) {
+    public void onUpdate(String i) {
         offset = offset + 20;
         httpService.topicService(i, offset, this);
     }
@@ -90,12 +96,6 @@ public class DetailActivity extends AppCompatActivity implements TopicDataCallba
             itemCoverList.add(itemCover);
         }
         itemRecyclerViewAdapter.addItem(itemCoverList);
-        recyclerView.post(new Runnable() {
-            @Override
-            public void run() {
-                itemRecyclerViewAdapter.notifyDataSetChanged();
-            }
-        });
     }
 
     @Override

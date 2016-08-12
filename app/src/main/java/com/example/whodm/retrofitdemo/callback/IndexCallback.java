@@ -10,7 +10,6 @@ import java.util.List;
  */
 public interface IndexCallback {
     void onIndexSuccess(List<Item> list);
-
     void onIndexNothing();
     void onIndexFail();
 }

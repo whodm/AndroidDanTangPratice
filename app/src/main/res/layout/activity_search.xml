@@ -27,25 +27,32 @@
                 android:layout_alignParentStart="true"
                 android:textColor="#ffffff" />
 
-
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:text="搜索"
-                android:id="@+id/textView2"
+                android:id="@+id/tv_search"
                 android:textColor="#ffffff"
                 android:layout_centerVertical="true"
                 android:layout_alignParentEnd="true" />
 
             <EditText
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/et_search"
                 android:layout_centerVertical="true"
-                android:layout_toStartOf="@+id/textView2"
-                android:layout_toEndOf="@+id/tv_back" />
+                android:layout_toStartOf="@+id/tv_search"
+                android:layout_toEndOf="@+id/tv_back"
+                android:textColor="#ffffff"
+                android:singleLine="true" />
         </RelativeLayout>
     </android.support.v7.widget.Toolbar>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 </LinearLayout>

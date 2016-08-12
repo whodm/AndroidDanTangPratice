@@ -58,6 +58,7 @@ public class GridViewAdapter extends BaseAdapter {
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(imageView);
         textView.setText(iconList.get(position).getTitle());
+        view.setTag(iconList.get(position).getContent_id());
         return view;
     }
 }

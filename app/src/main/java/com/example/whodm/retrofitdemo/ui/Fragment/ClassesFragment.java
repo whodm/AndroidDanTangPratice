@@ -107,8 +107,9 @@ public class ClassesFragment extends Fragment implements ClassesCallback, AllTop
         for (int i = 0; i < allData.collections.size(); i++) {
             TopicIcon topicIcon = new TopicIcon();
             topicIcon.setUrl(allData.collections.get(i).getBanner_image_url());
-            topicIcon.setContent_url(allData.collections.get(i).getId().toString());
+            topicIcon.setId(allData.collections.get(i).getId());
             topicIcons.add(topicIcon);
+            Log.d("class", "topic =" + topicIcon.getId() + "");
         }
         classRecyclerViewAdapter.setTopList(topicIcons);
         recyclerView.post(new Runnable() {

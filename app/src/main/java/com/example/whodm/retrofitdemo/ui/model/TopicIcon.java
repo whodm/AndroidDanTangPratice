@@ -5,7 +5,7 @@ package com.example.whodm.retrofitdemo.ui.model;
  */
 public class TopicIcon {
     private String url;
-    private String content_url;
+    private int id;
 
     public String getUrl() {
         return url;
@@ -15,11 +15,11 @@ public class TopicIcon {
         this.url = url;
     }
 
-    public String getContent_url() {
-        return content_url;
+    public int getId() {
+        return id;
     }
 
-    public void setContent_url(String content_url) {
-        this.content_url = content_url;
+    public void setId(int id) {
+        this.id = id;
     }
 }

@@ -21,7 +21,8 @@
             android:name=".ui.WebViewActivity"
             android:theme="@style/WebView" />
         <activity android:name=".ui.SearchActivity" />
-        <activity android:name=".ui.DetailActivity"></activity>
+        <activity android:name=".ui.DetailTopicActivity" />
+        <activity android:name=".ui.DetailIconActivity"></activity>
     </application>
 
 </manifest>

@@ -29,9 +29,12 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     private ItemViewHolder itemViewHolder;
 
+    private View footer;
+
     private Context context;
 
     public static final int TYPE_HEADER = 111;
+    public static final int TYPE_FOOTER = 222;
     public static final int TYPE_ITEM = 333;
 
     private EndlessLoadListener endlessLoadListener;
@@ -123,28 +126,62 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
     }
 
+    public View getFooter() {
+        return footer;
+    }
+
+    public void setFooter(View footer) {
+        this.footer = footer;
+    }
+
     @Override
     public int getItemViewType(int position) {
-        if (header == null) {
-
-            return TYPE_ITEM;
-        }
-        if (position == 0) {
-
-            return TYPE_HEADER;
-        }
+//        if (header == null && footer == null ) {
+//            return TYPE_ITEM;
+//        }
+//        if (position == 0 ) {
+//            return TYPE_HEADER;
+//        }
+//        return TYPE_ITEM;
         return TYPE_ITEM;
     }
 
-    public void addItem(List<ItemCover> list) {
-        if (header != null) {
-            items.addAll(list);
-            notifyItemInserted(items.size());
-        }
-        items.addAll(list);
-        notifyItemInserted(items.size() - 1);
+    public List<ItemCover> getItems() {
+        return items;
     }
 
+    public void setItems(List<ItemCover> items) {
+        this.items = items;
+    }
+
+    public void clearItems() {
+        int size = getItemCount();
+        this.items.clear();
+        this.header = null;
+        notifyDataSetChanged();
+//        if (header == null){
+//            notifyItemRangeRemoved(1,size);
+//        }
+//        notifyItemRangeRemoved(0,size);
+    }
+
+    public void addItem(List<ItemCover> list) {
+//        if (header != null) {
+//            items.addAll(list);
+////            notifyItemRangeInserted(size,list.size());
+//        }
+        items.addAll(list);
+//        notifyItemRangeInserted(size,list.size() - 1);
+        notifyDataSetChanged();
+    }
+
+    public class FooterViewHolder extends RecyclerView.ViewHolder {
+
+        public FooterViewHolder(View itemView) {
+            super(itemView);
+            itemView = footer;
+        }
+    }
 
     public class HeaderViewHolder extends RecyclerView.ViewHolder {
 

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -32,7 +33,9 @@ public class SingleFragment extends Fragment implements SingleCallback {
     private final static HttpService httpService = new HttpService();
     private RecyclerView recyclerView;
     private SingleRecyclerViewAdapter singleRecyclerViewAdapter;
+    private StaggeredGridLayoutManager staggeredGridLayoutManager;
     private int offset = 0;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -44,7 +47,10 @@ public class SingleFragment extends Fragment implements SingleCallback {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_single, container, false);
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_single);
-        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refresh_single);
+        staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+//        staggeredGridLayoutManager.setGapStrategy(0);
+        recyclerView.setLayoutManager(staggeredGridLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setHasFixedSize(true);
         singleRecyclerViewAdapter = new SingleRecyclerViewAdapter(getActivity());
@@ -63,6 +69,15 @@ public class SingleFragment extends Fragment implements SingleCallback {
             }
         });
         recyclerView.setAdapter(singleRecyclerViewAdapter);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                offset = 0;
+                singleRecyclerViewAdapter.clearItems();
+                init();
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
         init();
         return view;
     }
@@ -91,12 +106,6 @@ public class SingleFragment extends Fragment implements SingleCallback {
         }
         singleRecyclerViewAdapter.addItem(itemCoverList);
 
-        recyclerView.post(new Runnable() {
-            @Override
-            public void run() {
-                singleRecyclerViewAdapter.notifyDataSetChanged();
-            }
-        });
     }
 
     @Override

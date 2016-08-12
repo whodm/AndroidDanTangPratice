@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -40,6 +41,7 @@ public class OtherFragment extends Fragment implements IndexCallback {
     private static int Digtal = 17;
     private static int Beauty = 13;
     private static int Groceries = 22;
+    private SwipeRefreshLayout swipeRefreshLayout;
     private int offset = 0;
 
 
@@ -63,6 +65,7 @@ public class OtherFragment extends Fragment implements IndexCallback {
         //return super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_channel,container,false);
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_channel);
+        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refresh_channel);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         itemRecyclerViewAdapter = new ItemRecyclerViewAdapter(getActivity());
@@ -78,6 +81,15 @@ public class OtherFragment extends Fragment implements IndexCallback {
                 Intent intent = new Intent(getActivity(), WebViewActivity.class);
                 intent.putExtra("URL", url);
                 startActivity(intent);
+            }
+        });
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                offset = 0;
+                itemRecyclerViewAdapter.clearItems();
+                init();
+                swipeRefreshLayout.setRefreshing(false);
             }
         });
         recyclerView.setAdapter(itemRecyclerViewAdapter);
@@ -107,7 +119,6 @@ public class OtherFragment extends Fragment implements IndexCallback {
                 break;
         }
     }
-
     public void onUpdate() {
         offset = offset + 20;
         switch (position) {
@@ -131,7 +142,6 @@ public class OtherFragment extends Fragment implements IndexCallback {
                 break;
         }
     }
-
     @Override
     public void onIndexSuccess(List<Item> list) {
         List<ItemCover> itemCoverList = new ArrayList<>();
@@ -145,12 +155,6 @@ public class OtherFragment extends Fragment implements IndexCallback {
             itemCoverList.add(itemCover);
         }
         itemRecyclerViewAdapter.addItem(itemCoverList);
-        recyclerView.post(new Runnable() {
-            @Override
-            public void run() {
-                itemRecyclerViewAdapter.notifyDataSetChanged();
-            }
-        });
     }
 
     @Override

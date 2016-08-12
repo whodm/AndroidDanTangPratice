@@ -1,14 +1,18 @@
 package com.example.whodm.retrofitdemo.ui.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.AdapterView;
 
 import com.example.whodm.retrofitdemo.R;
+import com.example.whodm.retrofitdemo.ui.DetailIconActivity;
+import com.example.whodm.retrofitdemo.ui.DetailTopicActivity;
 import com.example.whodm.retrofitdemo.ui.MyGridView;
 import com.example.whodm.retrofitdemo.ui.model.Icon;
 import com.example.whodm.retrofitdemo.ui.model.TopicIcon;
@@ -26,6 +30,8 @@ public class ClassRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
     private static final int STYLE = 2222;
     private static final int PINLEI = 3333;
 
+    private ClassInnerRecyclerViewAdapter classInnerRecyclerViewAdapter;
+
     private LinearLayoutManager horizontalManager;
 
     private List<Icon> icons = new ArrayList<>();
@@ -36,10 +42,14 @@ public class ClassRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
 
     private List<Icon> iconList = new ArrayList<>();
 
+    private Intent i1, i2;
+
 
     public ClassRecyclerViewAdapter(Context context) {
         this.context = context;
         horizontalManager = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
+        i1 = new Intent(context, DetailTopicActivity.class);
+        i2 = new Intent(context, DetailIconActivity.class);
     }
 
     @Override
@@ -64,13 +74,36 @@ public class ClassRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
         if (getItemViewType(position) == TOPICICON) {
             TopicHolder topicHolder = (TopicHolder) holder;
             topicHolder.recyclerView.setLayoutManager(horizontalManager);
-            topicHolder.recyclerView.setAdapter(new ClassInnerRecyclerViewAdapter(context, topList));
+            classInnerRecyclerViewAdapter = new ClassInnerRecyclerViewAdapter(context, topList);
+            classInnerRecyclerViewAdapter.setOnItemClickListener(new ClassInnerRecyclerViewAdapter.OnItemClickListener() {
+                @Override
+                public void ItemClickListener(View view, int url) {
+                    i1.putExtra("ID", url + "");
+                    context.startActivity(i1);
+                }
+            });
+            topicHolder.recyclerView.setAdapter(classInnerRecyclerViewAdapter);
         } else if (getItemViewType(position) == STYLE) {
             IconHolder iconHolder = (IconHolder) holder;
             iconHolder.gridView.setAdapter(new GridViewAdapter(context, iconList));
+            iconHolder.gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    i2.putExtra("ICON", view.getTag().toString());
+                    Log.d("Class", view.getTag().toString());
+                    context.startActivity(i2);
+                }
+            });
         } else if (getItemViewType(position) == PINLEI) {
             PinLeiHolder pinLeiHolder = (PinLeiHolder) holder;
             pinLeiHolder.gridView.setAdapter(new GridViewAdapter(context, icons));
+            pinLeiHolder.gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    i2.putExtra("ICON", view.getTag().toString());
+                    context.startActivity(i2);
+                }
+            });
         }
     }
 
