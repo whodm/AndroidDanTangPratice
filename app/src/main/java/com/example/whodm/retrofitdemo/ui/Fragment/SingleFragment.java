@@ -16,12 +16,16 @@ import android.widget.Toast;
 
 import com.example.whodm.retrofitdemo.R;
 import com.example.whodm.retrofitdemo.callback.SingleCallback;
+import com.example.whodm.retrofitdemo.ui.LoopView;
 import com.example.whodm.retrofitdemo.ui.WebViewActivity;
 import com.example.whodm.retrofitdemo.ui.model.ItemCover;
 import com.example.whodm.retrofitdemo.ui.model.SingleCover;
 import com.example.whodm.retrofitdemo.model.single.SingleData;
 import com.example.whodm.retrofitdemo.service.HttpService;
 import com.example.whodm.retrofitdemo.ui.Adapter.SingleRecyclerViewAdapter;
+import com.example.whodm.retrofitdemo.ui.util.ConectionFailView;
+import com.example.whodm.retrofitdemo.ui.util.LoadView;
+import com.example.whodm.retrofitdemo.ui.util.NoMoreView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +40,9 @@ public class SingleFragment extends Fragment implements SingleCallback {
     private StaggeredGridLayoutManager staggeredGridLayoutManager;
     private int offset = 0;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private LoadView loadView;
+    private NoMoreView noMoreView;
+    private ConectionFailView conectionFailView;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -53,21 +60,10 @@ public class SingleFragment extends Fragment implements SingleCallback {
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setHasFixedSize(true);
+        loadView = new LoadView(getActivity());
+        noMoreView = new NoMoreView(getActivity());
+        conectionFailView = new ConectionFailView(getActivity());
         singleRecyclerViewAdapter = new SingleRecyclerViewAdapter(getActivity());
-        singleRecyclerViewAdapter.setEndlessLoadListener(new SingleRecyclerViewAdapter.EndlessLoadListener() {
-            @Override
-            public void loadMore() {
-                onUpdate();
-            }
-        });
-        singleRecyclerViewAdapter.setOnItemClickListener(new SingleRecyclerViewAdapter.OnItemClickListener() {
-            @Override
-            public void ItemClickListener(View view, String url) {
-                Intent intent = new Intent(getActivity(), WebViewActivity.class);
-                intent.putExtra("URL", url);
-                startActivity(intent);
-            }
-        });
         recyclerView.setAdapter(singleRecyclerViewAdapter);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -93,6 +89,20 @@ public class SingleFragment extends Fragment implements SingleCallback {
 
     @Override
     public void onSingleSuccess(SingleData singleData) {
+        singleRecyclerViewAdapter.setEndlessLoadListener(new SingleRecyclerViewAdapter.EndlessLoadListener() {
+            @Override
+            public void loadMore() {
+                onUpdate();
+            }
+        });
+        singleRecyclerViewAdapter.setOnItemClickListener(new SingleRecyclerViewAdapter.OnItemClickListener() {
+            @Override
+            public void ItemClickListener(View view, String url) {
+                Intent intent = new Intent(getActivity(), WebViewActivity.class);
+                intent.putExtra("URL", url);
+                startActivity(intent);
+            }
+        });
         List<SingleCover> itemCoverList = new ArrayList<>();
         SingleData single = singleData;
         for (int i = 0; i < single.items.size(); i++) {
@@ -105,16 +115,21 @@ public class SingleFragment extends Fragment implements SingleCallback {
             itemCoverList.add(singleCover);
         }
         singleRecyclerViewAdapter.addItem(itemCoverList);
+        singleRecyclerViewAdapter.setFooter(loadView);
 
     }
 
     @Override
     public void onSingleFail() {
-        Toast.makeText(getContext(), "Index连接失败", Toast.LENGTH_LONG).show();
+        //Toast.makeText(getContext(), "Index连接失败", Toast.LENGTH_LONG).show();
+        singleRecyclerViewAdapter.setFooter(conectionFailView);
+        singleRecyclerViewAdapter.setEndlessLoadListener(null);
     }
 
     @Override
     public void onSingleNothing() {
-        Toast.makeText(getContext(), "没有更多了", Toast.LENGTH_LONG).show();
+        //Toast.makeText(getContext(), "没有更多了", Toast.LENGTH_LONG).show();
+        singleRecyclerViewAdapter.setFooter(noMoreView);
+        singleRecyclerViewAdapter.setEndlessLoadListener(null);
     }
 }

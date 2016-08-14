@@ -246,7 +246,7 @@ public class HttpService {
             @Override
             public void onResponse(Response<BaseModel<IndexData<ArrayList<Item>>>> response, Retrofit retrofit) {
                 if (response.body().data.items == null || response.body().data.items.size() == 0) {
-                    Log.d("onRespone index",response.body().data.items+"");
+                    Log.d("onRespone Nothing", response.body().data.items + "");
                     callback.onIndexNothing();
                 } else {
                     Log.d("onRespone index",response.body().data.items.get(1).content_url);

@@ -3,17 +3,21 @@ package com.example.whodm.retrofitdemo.ui.Adapter;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.whodm.retrofitdemo.R;
 import com.example.whodm.retrofitdemo.ui.model.ItemCover;
+import com.example.whodm.retrofitdemo.ui.util.LoadView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +63,8 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (header != null && viewType == TYPE_HEADER) {
             return new HeaderViewHolder(header);
+        } else if (footer != null && viewType == TYPE_FOOTER) {
+            return new FooterViewHolder(footer);
         } else {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_layout, parent, false);
             ItemViewHolder viewHolder = new ItemViewHolder(view);
@@ -70,16 +76,20 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
+        int realPosition;
+        if (header != null) {
+            realPosition = position - 1;
+        } else {
+            realPosition = position;
+        }
         if (getItemViewType(position) == TYPE_HEADER) {
 
+        } else if (getItemViewType(position) == TYPE_FOOTER) {
+            if (endlessLoadListener != null && realPosition >= items.size() - 1) {
+                endlessLoadListener.loadMore();
+            }
         } else if (getItemViewType(position) == TYPE_ITEM) {
             itemViewHolder = (ItemViewHolder) holder;
-            int realPosition;
-            if (header != null) {
-                realPosition = position - 1;
-            } else {
-                realPosition = position;
-            }
             ItemCover itemCover = items.get(realPosition);
             Log.d("Item", realPosition + "");
             Glide.with(context)
@@ -90,9 +100,7 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
             itemViewHolder.tv_title.setText(itemCover.getTitle());
             itemViewHolder.tv_like.setText(itemCover.getLike());
             holder.itemView.setTag(itemCover.getContent_url());
-            if (endlessLoadListener != null && realPosition >= items.size() - 1) {
-                endlessLoadListener.loadMore();
-            }
+
         }
     }
 
@@ -119,10 +127,14 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     @Override
     public int getItemCount() {
-        if (header == null) {
+        if (header == null && footer == null) {
             return items.size();
-        } else {
+        } else if (header == null) {
             return items.size() + 1;
+        } else if (footer == null) {
+            return items.size() + 1;
+        } else {
+            return items.size() + 2;
         }
     }
 
@@ -131,18 +143,28 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     public void setFooter(View footer) {
-        this.footer = footer;
+        if (this.footer != null) {
+            this.footer = footer;
+            Log.d("wocaoChanged", getItemCount() + "");
+            notifyItemChanged(getItemCount() - 1);
+        } else {
+            this.footer = footer;
+            Log.d("wocaoInsert", getItemCount() + "");
+            notifyItemChanged(getItemCount());
+        }
     }
 
     @Override
     public int getItemViewType(int position) {
-//        if (header == null && footer == null ) {
-//            return TYPE_ITEM;
-//        }
-//        if (position == 0 ) {
-//            return TYPE_HEADER;
-//        }
-//        return TYPE_ITEM;
+        if (header == null && footer == null) {
+            return TYPE_ITEM;
+        }
+        if (position == 0 && header != null) {
+            return TYPE_HEADER;
+        }
+        if (position == getItemCount() - 1 && footer != null) {
+            return TYPE_FOOTER;
+        }
         return TYPE_ITEM;
     }
 
@@ -155,24 +177,20 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     public void clearItems() {
-        int size = getItemCount();
-        this.items.clear();
         this.header = null;
+        this.footer = null;
+        this.items.clear();
         notifyDataSetChanged();
-//        if (header == null){
-//            notifyItemRangeRemoved(1,size);
-//        }
-//        notifyItemRangeRemoved(0,size);
     }
 
     public void addItem(List<ItemCover> list) {
-//        if (header != null) {
-//            items.addAll(list);
-////            notifyItemRangeInserted(size,list.size());
-//        }
+        int size = getItemCount();
         items.addAll(list);
-//        notifyItemRangeInserted(size,list.size() - 1);
-        notifyDataSetChanged();
+        Log.d("Add item", "size = " + size + "");
+
+        notifyItemRangeChanged(size, list.size());
+
+        Log.d("Add item", "size = " + getItemCount() + "");
     }
 
     public class FooterViewHolder extends RecyclerView.ViewHolder {
@@ -180,6 +198,7 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
         public FooterViewHolder(View itemView) {
             super(itemView);
             itemView = footer;
+
         }
     }
 

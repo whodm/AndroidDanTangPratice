@@ -21,6 +21,9 @@ import com.example.whodm.retrofitdemo.ui.model.ItemCover;
 import com.example.whodm.retrofitdemo.model.index.Item;
 import com.example.whodm.retrofitdemo.service.HttpService;
 import com.example.whodm.retrofitdemo.ui.Adapter.ItemRecyclerViewAdapter;
+import com.example.whodm.retrofitdemo.ui.util.ConectionFailView;
+import com.example.whodm.retrofitdemo.ui.util.LoadView;
+import com.example.whodm.retrofitdemo.ui.util.NoMoreView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +46,9 @@ public class OtherFragment extends Fragment implements IndexCallback {
     private static int Groceries = 22;
     private SwipeRefreshLayout swipeRefreshLayout;
     private int offset = 0;
+    private LoadView loadView;
+    private NoMoreView noMoreView;
+    private ConectionFailView conectionFailView;
 
 
     public static OtherFragment newInstance(int position){
@@ -66,23 +72,13 @@ public class OtherFragment extends Fragment implements IndexCallback {
         View view = inflater.inflate(R.layout.fragment_channel,container,false);
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_channel);
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refresh_channel);
+        loadView = new LoadView(getActivity());
+        noMoreView = new NoMoreView(getActivity());
+        conectionFailView = new ConectionFailView(getActivity());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         itemRecyclerViewAdapter = new ItemRecyclerViewAdapter(getActivity());
-        itemRecyclerViewAdapter.setEndlessLoadListener(new ItemRecyclerViewAdapter.EndlessLoadListener() {
-            @Override
-            public void loadMore() {
-                onUpdate();
-            }
-        });
-        itemRecyclerViewAdapter.setOnItemClickListener(new ItemRecyclerViewAdapter.OnItemClickListener() {
-            @Override
-            public void ItemClickListener(View view, String url) {
-                Intent intent = new Intent(getActivity(), WebViewActivity.class);
-                intent.putExtra("URL", url);
-                startActivity(intent);
-            }
-        });
+        recyclerView.setAdapter(itemRecyclerViewAdapter);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -92,7 +88,6 @@ public class OtherFragment extends Fragment implements IndexCallback {
                 swipeRefreshLayout.setRefreshing(false);
             }
         });
-        recyclerView.setAdapter(itemRecyclerViewAdapter);
         init();
         return view;
     }
@@ -144,6 +139,20 @@ public class OtherFragment extends Fragment implements IndexCallback {
     }
     @Override
     public void onIndexSuccess(List<Item> list) {
+        itemRecyclerViewAdapter.setEndlessLoadListener(new ItemRecyclerViewAdapter.EndlessLoadListener() {
+            @Override
+            public void loadMore() {
+                onUpdate();
+            }
+        });
+        itemRecyclerViewAdapter.setOnItemClickListener(new ItemRecyclerViewAdapter.OnItemClickListener() {
+            @Override
+            public void ItemClickListener(View view, String url) {
+                Intent intent = new Intent(getActivity(), WebViewActivity.class);
+                intent.putExtra("URL", url);
+                startActivity(intent);
+            }
+        });
         List<ItemCover> itemCoverList = new ArrayList<>();
         for (int i = 0; i < list.size(); i++) {
             ItemCover itemCover = new ItemCover();
@@ -155,15 +164,21 @@ public class OtherFragment extends Fragment implements IndexCallback {
             itemCoverList.add(itemCover);
         }
         itemRecyclerViewAdapter.addItem(itemCoverList);
+        itemRecyclerViewAdapter.setFooter(loadView);
+        loadView.startAnime();
     }
 
     @Override
     public void onIndexFail() {
-        Toast.makeText(getContext(), "Index连接失败", Toast.LENGTH_LONG).show();
+        //Toast.makeText(getContext(), "Index连接失败", Toast.LENGTH_LONG).show();
+        itemRecyclerViewAdapter.setFooter(conectionFailView);
+        itemRecyclerViewAdapter.setEndlessLoadListener(null);
     }
 
     @Override
     public void onIndexNothing() {
-        Toast.makeText(getContext(), "没有更多了", Toast.LENGTH_LONG).show();
+//        Toast.makeText(getContext(), "没有更多了", Toast.LENGTH_LONG).show();
+        itemRecyclerViewAdapter.setFooter(noMoreView);
+        itemRecyclerViewAdapter.setEndlessLoadListener(null);
     }
 }

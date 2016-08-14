@@ -75,22 +75,6 @@ public class ClassesFragment extends Fragment implements ClassesCallback, AllTop
         recyclerView.setHasFixedSize(true);
         classRecyclerViewAdapter = new ClassRecyclerViewAdapter(getActivity());
         recyclerView.setAdapter(classRecyclerViewAdapter);
-//        topicRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_topic);
-//        styleRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_style);
-////        pinleiRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_pinlei);
-//        //container_one = (FrameLayout) view.findViewById(R.id.container_one);
-//        gridView = (GridView) view.findViewById(R.id.gridview);
-//        gridView.setOnTouchListener(new View.OnTouchListener() {
-//
-//            @Override
-//            public boolean onTouch(View v, MotionEvent event) {
-//                if (event.getAction() == MotionEvent.ACTION_MOVE) {
-//                    return true;
-//                }
-//                return false;
-//            }
-//        });
-//        initRecycleView();
         Log.d(TAG, "RUN");
         init();
         return view;
@@ -118,29 +102,21 @@ public class ClassesFragment extends Fragment implements ClassesCallback, AllTop
                 classRecyclerViewAdapter.notifyDataSetChanged();
             }
         });
-//        topicRecyclerViewAdapter.addItem(topicIcons);
-//        topicRecyclerViewAdapter.setEndlessLoadListener(new TopicRecyclerViewAdapter.EndlessLoadListener() {
-//            @Override
-//            public void loadMore() {
-//
-//            }
-//        });
-//        topicRecyclerView.setAdapter(topicRecyclerViewAdapter);
     }
 
     @Override
     public void onFail() {
-        Toast.makeText(getContext(), "连接失败", Toast.LENGTH_LONG).show();
+        //Toast.makeText(getContext(), "连接失败", Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void onAllTopicNothing() {
-        Toast.makeText(getContext(), "没有更多了", Toast.LENGTH_LONG).show();
+        //Toast.makeText(getContext(), "没有更多了", Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void onClassesNothing() {
-        Toast.makeText(getContext(), "没有更多了", Toast.LENGTH_LONG).show();
+        //Toast.makeText(getContext(), "没有更多了", Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -184,17 +160,8 @@ public class ClassesFragment extends Fragment implements ClassesCallback, AllTop
 
     @Override
     public void onClassesFail() {
-        Toast.makeText(getContext(), "连接失败", Toast.LENGTH_LONG).show();
+        //Toast.makeText(getContext(), "连接失败", Toast.LENGTH_LONG).show();
     }
 
-    public void initRecycleView() {
-//        topicRecyclerView.setLayoutManager(horizontalManager);
-//        styleRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL));
-//        topicRecyclerView.setItemAnimator(new DefaultItemAnimator());
-//        topicRecyclerView.setHasFixedSize(true);
-//        styleRecyclerView.setItemAnimator(new DefaultItemAnimator());
-//        styleRecyclerView.setHasFixedSize(true);
-//        styleRecyclerViewAdapter = new IconRecyclerViewAdapter(getActivity());
-////        topicRecyclerViewAdapter = new TopicRecyclerViewAdapter(getActivity());
-    }
+
 }

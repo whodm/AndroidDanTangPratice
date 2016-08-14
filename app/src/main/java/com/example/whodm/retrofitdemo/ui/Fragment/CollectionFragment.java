@@ -26,6 +26,9 @@ import com.example.whodm.retrofitdemo.model.index.Item;
 import com.example.whodm.retrofitdemo.service.HttpService;
 import com.example.whodm.retrofitdemo.ui.Adapter.ItemRecyclerViewAdapter;
 import com.example.whodm.retrofitdemo.ui.LoopView;
+import com.example.whodm.retrofitdemo.ui.util.ConectionFailView;
+import com.example.whodm.retrofitdemo.ui.util.LoadView;
+import com.example.whodm.retrofitdemo.ui.util.NoMoreView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +47,9 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
     private SwipeRefreshLayout swipeRefreshLayout;
     private LoopView loopView;
     private int time;
+    private LoadView loadView;
+    private NoMoreView noMoreView;
+    private ConectionFailView conectionFailView;
 
     @Nullable
     @Override
@@ -51,12 +57,15 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
         View view = inflater.inflate(R.layout.fragment_collection,container,false);
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler);
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refresh_collection);
+        loadView = new LoadView(getActivity());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setHasFixedSize(true);
         itemRecyclerViewAdapter = new ItemRecyclerViewAdapter(getActivity());
         recyclerView.setAdapter(itemRecyclerViewAdapter);
-        loopView = new LoopView(getContext());
+        loopView = new LoopView(getActivity());
+        noMoreView = new NoMoreView(getActivity());
+        conectionFailView = new ConectionFailView(getActivity());
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -64,21 +73,6 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
                 itemRecyclerViewAdapter.clearItems();
                 init();
                 swipeRefreshLayout.setRefreshing(false);
-            }
-        });
-        itemRecyclerViewAdapter.setEndlessLoadListener(new ItemRecyclerViewAdapter.EndlessLoadListener() {
-            @Override
-            public void loadMore() {
-                onUpdate();
-
-            }
-        });
-        itemRecyclerViewAdapter.setOnItemClickListener(new ItemRecyclerViewAdapter.OnItemClickListener() {
-            @Override
-            public void ItemClickListener(View view, String url) {
-                Intent intent = new Intent(getActivity(), WebViewActivity.class);
-                intent.putExtra("URL", url);
-                startActivity(intent);
             }
         });
         init();
@@ -100,27 +94,36 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
             imagesUrl.add(banner);
         }
         loopView.setImageUrl(imagesUrl);
-        itemRecyclerViewAdapter.setHeader(loopView);
-//        recyclerView.post(new Runnable() {
-//            @Override
-//            public void run() {
-//                itemRecyclerViewAdapter.notifyItemChanged(0);
-//            }
-//        });
     }
 
     @Override
     public void onBannerFail() {
-        Toast.makeText(getContext(), "滚滚滚连接失败", Toast.LENGTH_LONG).show();
+        //Toast.makeText(getContext(), "滚滚滚连接失败", Toast.LENGTH_LONG).show();
     }
 
     public void onUpdate() {
         offset = offset + 20;
+        httpservice.bannerService(this);
         httpservice.indexService(COLLECTION, offset, this);
     }
 
     @Override
     public void onIndexSuccess(final List<Item> list) {
+        itemRecyclerViewAdapter.setEndlessLoadListener(new ItemRecyclerViewAdapter.EndlessLoadListener() {
+            @Override
+            public void loadMore() {
+                onUpdate();
+
+            }
+        });
+        itemRecyclerViewAdapter.setOnItemClickListener(new ItemRecyclerViewAdapter.OnItemClickListener() {
+            @Override
+            public void ItemClickListener(View view, String url) {
+                Intent intent = new Intent(getActivity(), WebViewActivity.class);
+                intent.putExtra("URL", url);
+                startActivity(intent);
+            }
+        });
         List<ItemCover> itemCoverList = new ArrayList<>();
         for (int i = 0; i < list.size(); i++) {
             ItemCover itemCover = new ItemCover();
@@ -133,28 +136,30 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
         }
         time = time + 1;
         Log.d(TAG, "connect =" + time);
+        itemRecyclerViewAdapter.setHeader(loopView);
         itemRecyclerViewAdapter.addItem(itemCoverList);
-//        recyclerView.setAdapter(itemRecyclerViewAdapter);
-//        recyclerView.post(new Runnable() {
-//            @Override
-//            public void run() {
-//                itemRecyclerViewAdapter.notifyItemRangeChanged(offset + 1,list.size());
-//            }
-//        });
+        itemRecyclerViewAdapter.setFooter(loadView);
+        loadView.startAnime();
     }
 
     @Override
     public void onIndexFail() {
-        Toast.makeText(getContext(), "Index连接失败", Toast.LENGTH_LONG).show();
+        //Toast.makeText(getContext(), "Index连接失败", Toast.LENGTH_LONG).show();
+        itemRecyclerViewAdapter.setFooter(conectionFailView);
+        itemRecyclerViewAdapter.setEndlessLoadListener(null);
+
     }
 
     @Override
     public void onBannerNothing() {
-        Toast.makeText(getContext(), "没有更多了", Toast.LENGTH_LONG).show();
+//        Toast.makeText(getContext(), "没有更多了", Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void onIndexNothing() {
-        Toast.makeText(getContext(), "没有更多了", Toast.LENGTH_LONG).show();
+//        Toast.makeText(getContext(), "没有更多了", Toast.LENGTH_LONG).show();
+        itemRecyclerViewAdapter.setFooter(noMoreView);
+        itemRecyclerViewAdapter.setEndlessLoadListener(null);
+        //loadView.startAnime();
     }
 }
