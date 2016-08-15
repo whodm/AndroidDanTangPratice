@@ -27,6 +27,7 @@ import com.example.whodm.retrofitdemo.service.HttpService;
 import com.example.whodm.retrofitdemo.ui.Adapter.ItemRecyclerViewAdapter;
 import com.example.whodm.retrofitdemo.ui.LoopView;
 import com.example.whodm.retrofitdemo.ui.util.ConectionFailView;
+import com.example.whodm.retrofitdemo.ui.util.FirstInitFailView;
 import com.example.whodm.retrofitdemo.ui.util.LoadView;
 import com.example.whodm.retrofitdemo.ui.util.NoMoreView;
 
@@ -50,6 +51,8 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
     private LoadView loadView;
     private NoMoreView noMoreView;
     private ConectionFailView conectionFailView;
+    private boolean firstInit = true;
+    private FirstInitFailView firstInitFailView;
 
     @Nullable
     @Override
@@ -65,12 +68,14 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
         recyclerView.setAdapter(itemRecyclerViewAdapter);
         loopView = new LoopView(getActivity());
         noMoreView = new NoMoreView(getActivity());
+        firstInitFailView = new FirstInitFailView(getActivity());
         conectionFailView = new ConectionFailView(getActivity());
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 offset = 0;
                 itemRecyclerViewAdapter.clearItems();
+                firstInit = true;
                 init();
                 swipeRefreshLayout.setRefreshing(false);
             }
@@ -130,24 +135,27 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
             itemCover.setUrl(list.get(i).cover_image_url);
             itemCover.setTitle(list.get(i).title);
             itemCover.setLike(list.get(i).likes_count.toString());
-            Log.d(TAG, "num = " + i + "");
             itemCover.setContent_url(list.get(i).content_url);
             itemCoverList.add(itemCover);
         }
-        time = time + 1;
-        Log.d(TAG, "connect =" + time);
         itemRecyclerViewAdapter.setHeader(loopView);
         itemRecyclerViewAdapter.addItem(itemCoverList);
         itemRecyclerViewAdapter.setFooter(loadView);
         loadView.startAnime();
+        firstInit = false;
     }
 
     @Override
     public void onIndexFail() {
+        if (firstInit) {
+            itemRecyclerViewAdapter.setFooter(firstInitFailView);
+            itemRecyclerViewAdapter.setEndlessLoadListener(null);
+            firstInit = false;
+            return;
+        }
         //Toast.makeText(getContext(), "Index连接失败", Toast.LENGTH_LONG).show();
         itemRecyclerViewAdapter.setFooter(conectionFailView);
         itemRecyclerViewAdapter.setEndlessLoadListener(null);
-
     }
 
     @Override

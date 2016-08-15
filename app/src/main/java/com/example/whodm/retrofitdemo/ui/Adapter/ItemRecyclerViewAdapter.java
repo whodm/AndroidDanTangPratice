@@ -85,6 +85,8 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
         if (getItemViewType(position) == TYPE_HEADER) {
 
         } else if (getItemViewType(position) == TYPE_FOOTER) {
+            FooterViewHolder holder1 = (FooterViewHolder) holder;
+
             if (endlessLoadListener != null && realPosition >= items.size() - 1) {
                 endlessLoadListener.loadMore();
             }
@@ -100,7 +102,6 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
             itemViewHolder.tv_title.setText(itemCover.getTitle());
             itemViewHolder.tv_like.setText(itemCover.getLike());
             holder.itemView.setTag(itemCover.getContent_url());
-
         }
     }
 
@@ -129,9 +130,7 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
     public int getItemCount() {
         if (header == null && footer == null) {
             return items.size();
-        } else if (header == null) {
-            return items.size() + 1;
-        } else if (footer == null) {
+        } else if (header == null || footer == null) {
             return items.size() + 1;
         } else {
             return items.size() + 2;
@@ -185,6 +184,8 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     public void addItem(List<ItemCover> list) {
         int size = getItemCount();
+//        this.footer = null;
+//        notifyItemRemoved(size -  1);
         items.addAll(list);
         Log.d("Add item", "size = " + size + "");
 
@@ -197,7 +198,7 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         public FooterViewHolder(View itemView) {
             super(itemView);
-            itemView = footer;
+            //itemView = footer;
 
         }
     }
@@ -206,7 +207,7 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         public HeaderViewHolder(View itemView) {
             super(itemView);
-            itemView = header;
+            //itemView = header;
         }
     }
 

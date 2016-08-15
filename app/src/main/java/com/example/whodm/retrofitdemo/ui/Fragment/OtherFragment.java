@@ -22,6 +22,7 @@ import com.example.whodm.retrofitdemo.model.index.Item;
 import com.example.whodm.retrofitdemo.service.HttpService;
 import com.example.whodm.retrofitdemo.ui.Adapter.ItemRecyclerViewAdapter;
 import com.example.whodm.retrofitdemo.ui.util.ConectionFailView;
+import com.example.whodm.retrofitdemo.ui.util.FirstInitFailView;
 import com.example.whodm.retrofitdemo.ui.util.LoadView;
 import com.example.whodm.retrofitdemo.ui.util.NoMoreView;
 
@@ -48,7 +49,9 @@ public class OtherFragment extends Fragment implements IndexCallback {
     private int offset = 0;
     private LoadView loadView;
     private NoMoreView noMoreView;
+    private FirstInitFailView firstInitFailView;
     private ConectionFailView conectionFailView;
+    private boolean firstInit = true;
 
 
     public static OtherFragment newInstance(int position){
@@ -72,9 +75,17 @@ public class OtherFragment extends Fragment implements IndexCallback {
         View view = inflater.inflate(R.layout.fragment_channel,container,false);
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_channel);
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refresh_channel);
-        loadView = new LoadView(getActivity());
-        noMoreView = new NoMoreView(getActivity());
-        conectionFailView = new ConectionFailView(getActivity());
+
+
+//        loadView = new LoadView(getActivity());
+//        noMoreView = new NoMoreView(getActivity());
+//        firstInitFailView = new FirstInitFailView(getActivity());
+//        conectionFailView = new ConectionFailView(getActivity());
+
+
+
+
+
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         itemRecyclerViewAdapter = new ItemRecyclerViewAdapter(getActivity());
@@ -84,6 +95,7 @@ public class OtherFragment extends Fragment implements IndexCallback {
             public void onRefresh() {
                 offset = 0;
                 itemRecyclerViewAdapter.clearItems();
+                firstInit = true;
                 init();
                 swipeRefreshLayout.setRefreshing(false);
             }
@@ -166,10 +178,17 @@ public class OtherFragment extends Fragment implements IndexCallback {
         itemRecyclerViewAdapter.addItem(itemCoverList);
         itemRecyclerViewAdapter.setFooter(loadView);
         loadView.startAnime();
+        firstInit = false;
     }
 
     @Override
     public void onIndexFail() {
+        if (firstInit) {
+            itemRecyclerViewAdapter.setFooter(firstInitFailView);
+            itemRecyclerViewAdapter.setEndlessLoadListener(null);
+            firstInit = false;
+            return;
+        }
         //Toast.makeText(getContext(), "Index连接失败", Toast.LENGTH_LONG).show();
         itemRecyclerViewAdapter.setFooter(conectionFailView);
         itemRecyclerViewAdapter.setEndlessLoadListener(null);
