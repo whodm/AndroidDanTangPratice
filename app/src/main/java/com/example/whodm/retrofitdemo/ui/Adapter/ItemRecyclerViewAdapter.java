@@ -16,8 +16,11 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.whodm.retrofitdemo.R;
+import com.example.whodm.retrofitdemo.ui.LoopView;
 import com.example.whodm.retrofitdemo.ui.model.ItemCover;
+import com.example.whodm.retrofitdemo.ui.util.FirstInitFailView;
 import com.example.whodm.retrofitdemo.ui.util.LoadView;
+import com.example.whodm.retrofitdemo.ui.util.NoMoreView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,12 +34,21 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
     //headers
     private View header;
 
+    private LoopView loopView;
+    private NoMoreView noMoreView;
+    private LoadView loadView;
+    private FirstInitFailView firstInitFailView;
+
     private ItemViewHolder itemViewHolder;
 
     private View footer;
 
     private Context context;
 
+    public static final int VIEW_LOOPVIEW = 000;
+    public static final int VIEW_NOMOREVIEW = 999;
+    public static final int VIEW_LOAD = 888;
+    public static final int VIEW_FIRST = 777;
     public static final int TYPE_HEADER = 111;
     public static final int TYPE_FOOTER = 222;
     public static final int TYPE_ITEM = 333;
@@ -62,9 +74,13 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (header != null && viewType == TYPE_HEADER) {
-            return new HeaderViewHolder(header);
+            FrameLayout frameLayout = new FrameLayout(parent.getContext());
+            frameLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            return new HeaderViewHolder(frameLayout);
         } else if (footer != null && viewType == TYPE_FOOTER) {
-            return new FooterViewHolder(footer);
+            FrameLayout frameLayout = new FrameLayout(parent.getContext());
+            frameLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            return new FooterViewHolder(frameLayout);
         } else {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_layout, parent, false);
             ItemViewHolder viewHolder = new ItemViewHolder(view);
@@ -85,7 +101,7 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
         if (getItemViewType(position) == TYPE_HEADER) {
 
         } else if (getItemViewType(position) == TYPE_FOOTER) {
-            FooterViewHolder holder1 = (FooterViewHolder) holder;
+
 
             if (endlessLoadListener != null && realPosition >= items.size() - 1) {
                 endlessLoadListener.loadMore();
@@ -141,30 +157,37 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
         return footer;
     }
 
-    public void setFooter(View footer) {
-        if (this.footer != null) {
-            this.footer = footer;
-            Log.d("wocaoChanged", getItemCount() + "");
-            notifyItemChanged(getItemCount() - 1);
-        } else {
-            this.footer = footer;
-            Log.d("wocaoInsert", getItemCount() + "");
-            notifyItemChanged(getItemCount());
-        }
+    public void setFooter(int i) {
+//        if (this.footer != null) {
+//            this.footer = footer;
+//            Log.d("wocaoChanged", getItemCount() + "");
+//            notifyItemChanged(getItemCount() - 1);
+//        } else {
+//            this.footer = footer;
+//            Log.d("wocaoInsert", getItemCount() + "");
+//            notifyItemChanged(getItemCount());
+//        }
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (header == null && footer == null) {
-            return TYPE_ITEM;
-        }
-        if (position == 0 && header != null) {
+        if (position == 0) {
             return TYPE_HEADER;
         }
-        if (position == getItemCount() - 1 && footer != null) {
+        if (position == getItemCount() - 1) {
             return TYPE_FOOTER;
         }
         return TYPE_ITEM;
+//        if (header == null && footer == null) {
+//            return TYPE_ITEM;
+//        }
+//        if (position == 0 && header != null) {
+//            return TYPE_HEADER;
+//        }
+//        if (position == getItemCount() - 1 && footer != null) {
+//            return TYPE_FOOTER;
+//        }
+//        return TYPE_ITEM;
     }
 
     public List<ItemCover> getItems() {
@@ -195,19 +218,18 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     public class FooterViewHolder extends RecyclerView.ViewHolder {
-
+        private FrameLayout frameLayout;
         public FooterViewHolder(View itemView) {
             super(itemView);
-            //itemView = footer;
-
+            frameLayout = (FrameLayout) itemView;
         }
     }
 
     public class HeaderViewHolder extends RecyclerView.ViewHolder {
-
+        private FrameLayout frameLayout;
         public HeaderViewHolder(View itemView) {
             super(itemView);
-            //itemView = header;
+            frameLayout = (FrameLayout) itemView;
         }
     }
 
