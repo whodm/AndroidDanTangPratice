@@ -109,12 +109,16 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
         if (getItemViewType(position) == TYPE_HEADER) {
             if (holder instanceof HeaderViewHolder) {
                 ((HeaderViewHolder) holder).frameLayout.removeAllViews();
-                ((HeaderViewHolder) holder).frameLayout.addView(header);
+                if (header != null) {
+                    ((HeaderViewHolder) holder).frameLayout.addView(header);
+                }
             }
         } else if (getItemViewType(position) == TYPE_FOOTER) {
             if (holder instanceof FooterViewHolder) {
                 ((FooterViewHolder) holder).frameLayout.removeAllViews();
-                ((FooterViewHolder) holder).frameLayout.addView(footer);
+                if (footer != null) {
+                    ((FooterViewHolder) holder).frameLayout.addView(footer);
+                }
             }
             if (endlessLoadListener != null && position - 1 >= items.size() - 1) {
                 endlessLoadListener.loadMore();
@@ -172,6 +176,7 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     public void setFooter(int i) {
         if (i == VIEW_LOAD) {
+            loadView.startAnime();
             footer = loadView;
         }
         if (i == VIEW_NOMOREVIEW) {
