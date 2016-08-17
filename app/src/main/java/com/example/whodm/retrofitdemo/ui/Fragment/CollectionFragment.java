@@ -47,12 +47,10 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
     private int offset = 0;
     private SwipeRefreshLayout swipeRefreshLayout;
     private LoopView loopView;
-    private int time;
-    private LoadView loadView;
-    private NoMoreView noMoreView;
-    private ConectionFailView conectionFailView;
     private boolean firstInit = true;
-    private FirstInitFailView firstInitFailView;
+    public static final int VIEW_NOMOREVIEW = 999;
+    public static final int VIEW_LOAD = 888;
+    public static final int VIEW_FIRST = 777;
 
     @Nullable
     @Override
@@ -60,16 +58,12 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
         View view = inflater.inflate(R.layout.fragment_collection,container,false);
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler);
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refresh_collection);
-        loadView = new LoadView(getActivity());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setHasFixedSize(true);
         itemRecyclerViewAdapter = new ItemRecyclerViewAdapter(getActivity());
         recyclerView.setAdapter(itemRecyclerViewAdapter);
         loopView = new LoopView(getActivity());
-        noMoreView = new NoMoreView(getActivity());
-        firstInitFailView = new FirstInitFailView(getActivity());
-        conectionFailView = new ConectionFailView(getActivity());
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -103,7 +97,7 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
 
     @Override
     public void onBannerFail() {
-        //Toast.makeText(getContext(), "滚滚滚连接失败", Toast.LENGTH_LONG).show();
+
     }
 
     public void onUpdate() {
@@ -138,36 +132,24 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
             itemCover.setContent_url(list.get(i).content_url);
             itemCoverList.add(itemCover);
         }
-        itemRecyclerViewAdapter.setHeader(loopView);
         itemRecyclerViewAdapter.addItem(itemCoverList);
-        itemRecyclerViewAdapter.setFooter(loadView);
-        loadView.startAnime();
+        itemRecyclerViewAdapter.setFooter(VIEW_LOAD);
+        //loadView.startAnime();
         firstInit = false;
     }
 
     @Override
     public void onIndexFail() {
-        if (firstInit) {
-            itemRecyclerViewAdapter.setFooter(firstInitFailView);
-            itemRecyclerViewAdapter.setEndlessLoadListener(null);
-            firstInit = false;
-            return;
-        }
-        //Toast.makeText(getContext(), "Index连接失败", Toast.LENGTH_LONG).show();
-        itemRecyclerViewAdapter.setFooter(conectionFailView);
-        itemRecyclerViewAdapter.setEndlessLoadListener(null);
+
     }
 
     @Override
     public void onBannerNothing() {
-//        Toast.makeText(getContext(), "没有更多了", Toast.LENGTH_LONG).show();
+
     }
 
     @Override
     public void onIndexNothing() {
-//        Toast.makeText(getContext(), "没有更多了", Toast.LENGTH_LONG).show();
-        itemRecyclerViewAdapter.setFooter(noMoreView);
-        itemRecyclerViewAdapter.setEndlessLoadListener(null);
-        //loadView.startAnime();
+
     }
 }

@@ -185,7 +185,7 @@ public class SingleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
         items.addAll(list);
         Log.d("Add item", "size = " + size + "");
         notifyItemRangeChanged(size, list.size());
-        Log.d("Add item", "size = " + getItemCount() + "");
+        Log.d("Add item", "size = " + footer + "");
     }
 
     public class FooterViewHolder extends RecyclerView.ViewHolder {

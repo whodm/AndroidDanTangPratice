@@ -47,10 +47,6 @@ public class OtherFragment extends Fragment implements IndexCallback {
     private static int Groceries = 22;
     private SwipeRefreshLayout swipeRefreshLayout;
     private int offset = 0;
-    private LoadView loadView;
-    private NoMoreView noMoreView;
-    private FirstInitFailView firstInitFailView;
-    private ConectionFailView conectionFailView;
     private boolean firstInit = true;
 
 
@@ -75,17 +71,6 @@ public class OtherFragment extends Fragment implements IndexCallback {
         View view = inflater.inflate(R.layout.fragment_channel,container,false);
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_channel);
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refresh_channel);
-
-
-//        loadView = new LoadView(getActivity());
-//        noMoreView = new NoMoreView(getActivity());
-//        firstInitFailView = new FirstInitFailView(getActivity());
-//        conectionFailView = new ConectionFailView(getActivity());
-
-
-
-
-
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         itemRecyclerViewAdapter = new ItemRecyclerViewAdapter(getActivity());
@@ -176,28 +161,16 @@ public class OtherFragment extends Fragment implements IndexCallback {
             itemCoverList.add(itemCover);
         }
         itemRecyclerViewAdapter.addItem(itemCoverList);
-        itemRecyclerViewAdapter.setFooter(loadView);
-        loadView.startAnime();
         firstInit = false;
     }
 
     @Override
     public void onIndexFail() {
-        if (firstInit) {
-            itemRecyclerViewAdapter.setFooter(firstInitFailView);
-            itemRecyclerViewAdapter.setEndlessLoadListener(null);
-            firstInit = false;
-            return;
-        }
-        //Toast.makeText(getContext(), "Index连接失败", Toast.LENGTH_LONG).show();
-        itemRecyclerViewAdapter.setFooter(conectionFailView);
-        itemRecyclerViewAdapter.setEndlessLoadListener(null);
+
     }
 
     @Override
     public void onIndexNothing() {
-//        Toast.makeText(getContext(), "没有更多了", Toast.LENGTH_LONG).show();
-        itemRecyclerViewAdapter.setFooter(noMoreView);
-        itemRecyclerViewAdapter.setEndlessLoadListener(null);
+
     }
 }
