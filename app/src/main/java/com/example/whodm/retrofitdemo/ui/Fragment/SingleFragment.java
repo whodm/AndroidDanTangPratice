@@ -8,17 +8,13 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.example.whodm.retrofitdemo.R;
 import com.example.whodm.retrofitdemo.callback.SingleCallback;
-import com.example.whodm.retrofitdemo.ui.LoopView;
 import com.example.whodm.retrofitdemo.ui.WebViewActivity;
-import com.example.whodm.retrofitdemo.ui.model.ItemCover;
 import com.example.whodm.retrofitdemo.ui.model.SingleCover;
 import com.example.whodm.retrofitdemo.model.single.SingleData;
 import com.example.whodm.retrofitdemo.service.HttpService;

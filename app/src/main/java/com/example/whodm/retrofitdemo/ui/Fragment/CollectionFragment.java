@@ -8,16 +8,13 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.example.whodm.retrofitdemo.callback.BannerCallback;
 import com.example.whodm.retrofitdemo.R;
 import com.example.whodm.retrofitdemo.callback.IndexCallback;
-import com.example.whodm.retrofitdemo.ui.DetailTopicActivity;
 import com.example.whodm.retrofitdemo.ui.WebViewActivity;
 import com.example.whodm.retrofitdemo.ui.model.Banner;
 import com.example.whodm.retrofitdemo.ui.model.ItemCover;
@@ -25,11 +22,6 @@ import com.example.whodm.retrofitdemo.model.banners.Banners;
 import com.example.whodm.retrofitdemo.model.index.Item;
 import com.example.whodm.retrofitdemo.service.HttpService;
 import com.example.whodm.retrofitdemo.ui.Adapter.ItemRecyclerViewAdapter;
-import com.example.whodm.retrofitdemo.ui.LoopView;
-import com.example.whodm.retrofitdemo.ui.util.ConectionFailView;
-import com.example.whodm.retrofitdemo.ui.util.FirstInitFailView;
-import com.example.whodm.retrofitdemo.ui.util.LoadView;
-import com.example.whodm.retrofitdemo.ui.util.NoMoreView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +38,6 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
     private final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
     private int offset = 0;
     private SwipeRefreshLayout swipeRefreshLayout;
-    private LoopView loopView;
     private boolean firstInit = true;
     public static final int VIEW_NOMOREVIEW = 999;
     public static final int VIEW_LOAD = 888;
@@ -92,7 +83,7 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
             banner.setUrl(bannerList.get(i).getImage_url());
             imagesUrl.add(banner);
         }
-        loopView.setImageUrl(imagesUrl);
+        itemRecyclerViewAdapter.addLoopViewImages(imagesUrl);
     }
 
     @Override
@@ -132,15 +123,18 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
             itemCover.setContent_url(list.get(i).content_url);
             itemCoverList.add(itemCover);
         }
-        //itemRecyclerViewAdapter.setHeader(1);
         itemRecyclerViewAdapter.addItem(itemCoverList);
-        //itemRecyclerViewAdapter.setFooter(VIEW_LOAD);
+        itemRecyclerViewAdapter.setFooter(VIEW_LOAD);
         firstInit = false;
     }
 
     @Override
     public void onIndexFail() {
-        itemRecyclerViewAdapter.setFooter(VIEW_FAIL);
+        if (firstInit) {
+            itemRecyclerViewAdapter.setHeader(VIEW_FIRST);
+        } else {
+            itemRecyclerViewAdapter.setFooter(VIEW_FAIL);
+        }
     }
 
     @Override
@@ -151,5 +145,6 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
     @Override
     public void onIndexNothing() {
         itemRecyclerViewAdapter.setFooter(VIEW_NOMOREVIEW);
+        itemRecyclerViewAdapter.setEndlessLoadListener(null);
     }
 }

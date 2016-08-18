@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.example.whodm.retrofitdemo.R;
 import com.example.whodm.retrofitdemo.callback.IndexCallback;
+import com.example.whodm.retrofitdemo.ui.Adapter.OtherItemRecyclerViewAdapter;
 import com.example.whodm.retrofitdemo.ui.WebViewActivity;
 import com.example.whodm.retrofitdemo.ui.model.ItemCover;
 import com.example.whodm.retrofitdemo.model.index.Item;
@@ -37,6 +38,7 @@ public class OtherFragment extends Fragment implements IndexCallback {
     private static final String ARG_POSITION = "position";
     private RecyclerView recyclerView;
     private ItemRecyclerViewAdapter itemRecyclerViewAdapter;
+    private OtherItemRecyclerViewAdapter otherItemRecyclerViewAdapter;
     private final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
     private int position;
     private final static HttpService httpService = new HttpService();
@@ -77,13 +79,14 @@ public class OtherFragment extends Fragment implements IndexCallback {
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refresh_channel);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        itemRecyclerViewAdapter = new ItemRecyclerViewAdapter(getActivity());
-        recyclerView.setAdapter(itemRecyclerViewAdapter);
+        //itemRecyclerViewAdapter = new ItemRecyclerViewAdapter(getActivity());
+        otherItemRecyclerViewAdapter = new OtherItemRecyclerViewAdapter(getActivity());
+        recyclerView.setAdapter(otherItemRecyclerViewAdapter);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 offset = 0;
-                itemRecyclerViewAdapter.clearItems();
+                otherItemRecyclerViewAdapter.clearItem();
                 firstInit = true;
                 init();
                 swipeRefreshLayout.setRefreshing(false);
@@ -140,13 +143,13 @@ public class OtherFragment extends Fragment implements IndexCallback {
     }
     @Override
     public void onIndexSuccess(List<Item> list) {
-        itemRecyclerViewAdapter.setEndlessLoadListener(new ItemRecyclerViewAdapter.EndlessLoadListener() {
+        otherItemRecyclerViewAdapter.setEndlessLoadListener(new OtherItemRecyclerViewAdapter.EndlessLoadListener() {
             @Override
             public void loadMore() {
                 onUpdate();
             }
         });
-        itemRecyclerViewAdapter.setOnItemClickListener(new ItemRecyclerViewAdapter.OnItemClickListener() {
+        otherItemRecyclerViewAdapter.setOnItemClickListener(new OtherItemRecyclerViewAdapter.OnItemClickListener() {
             @Override
             public void ItemClickListener(View view, String url) {
                 Intent intent = new Intent(getActivity(), WebViewActivity.class);
@@ -154,6 +157,7 @@ public class OtherFragment extends Fragment implements IndexCallback {
                 startActivity(intent);
             }
         });
+
         List<ItemCover> itemCoverList = new ArrayList<>();
         for (int i = 0; i < list.size(); i++) {
             ItemCover itemCover = new ItemCover();
@@ -164,17 +168,24 @@ public class OtherFragment extends Fragment implements IndexCallback {
             itemCover.setContent_url(list.get(i).content_url);
             itemCoverList.add(itemCover);
         }
-        itemRecyclerViewAdapter.addItem(itemCoverList);
+        otherItemRecyclerViewAdapter.addItem(itemCoverList);
+        otherItemRecyclerViewAdapter.setFooterView(VIEW_LOAD);
         firstInit = false;
     }
 
     @Override
     public void onIndexFail() {
-        itemRecyclerViewAdapter.setFooter(VIEW_FAIL);
+        if (firstInit) {
+            otherItemRecyclerViewAdapter.setFooterView(VIEW_FIRST);
+        } else {
+            otherItemRecyclerViewAdapter.setFooterView(VIEW_FAIL);
+        }
+
     }
 
     @Override
     public void onIndexNothing() {
-        itemRecyclerViewAdapter.setFooter(VIEW_NOMOREVIEW);
+        otherItemRecyclerViewAdapter.setFooterView(VIEW_NOMOREVIEW);
+        otherItemRecyclerViewAdapter.setEndlessLoadListener(null);
     }
 }

@@ -2,22 +2,18 @@ package com.example.whodm.retrofitdemo.ui.Adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.whodm.retrofitdemo.R;
-import com.example.whodm.retrofitdemo.ui.Fragment.IndexFragment;
-import com.example.whodm.retrofitdemo.ui.LoopView;
+import com.example.whodm.retrofitdemo.ui.util.LoopView;
+import com.example.whodm.retrofitdemo.ui.model.Banner;
 import com.example.whodm.retrofitdemo.ui.model.ItemCover;
 import com.example.whodm.retrofitdemo.ui.util.ConectionFailView;
 import com.example.whodm.retrofitdemo.ui.util.FirstInitFailView;
@@ -36,13 +32,12 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
     //headers
     private View header;
 
-//    private NoMoreView noMoreView;
-//    private LoadView loadView;
-//    private FirstInitFailView firstInitFailView;
-//    private ConectionFailView conectionFailView;
+    private NoMoreView noMoreView;
+    private LoadView loadView;
+    private FirstInitFailView firstInitFailView;
+    private ConectionFailView conectionFailView;
+    private LoopView loopView;
 
-    private View mHeader;
-    private View mFooter;
 
     private ItemViewHolder itemViewHolder;
 
@@ -50,7 +45,6 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     private Context context;
 
-    public static final int VIEW_LOOPVIEW = 000;
     public static final int VIEW_NOMOREVIEW = 999;
     public static final int VIEW_LOAD = 888;
     public static final int VIEW_FIRST = 777;
@@ -65,22 +59,25 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     public ItemRecyclerViewAdapter(Context context) {
         this.context = context;
-        mHeader = LayoutInflater.from(context).inflate(R.layout.layout_header, null);
-        mFooter = LayoutInflater.from(context).inflate(R.layout.layout_footer, null);
-//        noMoreView = new NoMoreView(context);
-//        loadView = new LoadView(context);
-//        firstInitFailView = new FirstInitFailView(context);
-//        conectionFailView = new ConectionFailView(context);
+        noMoreView = new NoMoreView(context);
+        loadView = new LoadView(context);
+        loopView = new LoopView(context);
+        firstInitFailView = new FirstInitFailView(context);
+        conectionFailView = new ConectionFailView(context);
     }
 
-    public View getHeader() {
-        return header;
+    public void addLoopViewImages(List<Banner> imagesUrl) {
+        loopView.setImageUrl(imagesUrl);
+        this.setHeader(0);
     }
-
 
     public void setHeader(int i) {
-        header = mHeader;
-        notifyDataSetChanged();
+        if (i == VIEW_FIRST) {
+            header = firstInitFailView;
+        } else {
+            header = loopView;
+        }
+
     }
 
     @Override
@@ -159,42 +156,23 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
     @Override
     public int getItemCount() {
         return items.size() + 2;
-//        if (header == null && footer == null) {
-//            return items.size();
-//        } else if (header == null || footer == null) {
-//            return items.size() + 1;
-//        } else {
-//            return items.size() + 2;
-//        }
-    }
-
-    public View getFooter() {
-        return footer;
     }
 
     public void setFooter(int i) {
-//        if (i == VIEW_LOAD) {
-//            loadView.startAnime();
-//            footer = loadView;
-//        }
-//        if (i == VIEW_NOMOREVIEW) {
-//            footer = noMoreView;
-//        }
-//        if (i == VIEW_FIRST) {
-//            footer = firstInitFailView;
-//        }
-        footer = mFooter;
-//        notifyItemChanged(getItemCount() - 1);
+        if (i == VIEW_LOAD) {
+            loadView.startAnime();
+            footer = loadView;
+        }
+        if (i == VIEW_NOMOREVIEW) {
+            footer = noMoreView;
+        }
+        if (i == VIEW_FIRST) {
+            footer = firstInitFailView;
+        }
+        if (i == VIEW_FAIL) {
+            footer = conectionFailView;
+        }
         notifyDataSetChanged();
-//        if (this.footer != null) {
-//            this.footer = footer;
-//            Log.d("wocaoChanged", getItemCount() + "");
-//            notifyItemChanged(getItemCount() - 1);
-//        } else {
-//            this.footer = footer;
-//            Log.d("wocaoInsert", getItemCount() + "");
-//            notifyItemChanged(getItemCount());
-//        }
     }
 
     @Override
@@ -206,16 +184,6 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
             return TYPE_FOOTER;
         }
         return TYPE_ITEM;
-//        if (header == null && footer == null) {
-//            return TYPE_ITEM;
-//        }
-//        if (position == 0 && header != null) {
-//            return TYPE_HEADER;
-//        }
-//        if (position == getItemCount() - 1 && footer != null) {
-//            return TYPE_FOOTER;
-//        }
-//        return TYPE_ITEM;
     }
 
     public List<ItemCover> getItems() {
@@ -234,8 +202,8 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
     public void addItem(List<ItemCover> list) {
         int size = getItemCount();
         items.addAll(list);
-//        notifyItemRangeInserted(size - 1,list.size());
-        notifyDataSetChanged();
+        notifyItemRangeInserted(size - 1, list.size());
+        //notifyDataSetChanged();
     }
 
     public class FooterViewHolder extends RecyclerView.ViewHolder {

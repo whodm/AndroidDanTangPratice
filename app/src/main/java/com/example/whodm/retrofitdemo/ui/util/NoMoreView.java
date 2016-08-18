@@ -31,7 +31,9 @@ public class NoMoreView extends LinearLayout {
                 LayoutParams.WRAP_CONTENT);
         params.gravity = Gravity.CENTER;
 
-        this.setOrientation(HORIZONTAL);
+        tv_None.setLayoutParams(params);
+
+        this.setOrientation(VERTICAL);
 
         this.addView(tv_None);
 
