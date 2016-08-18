@@ -48,6 +48,10 @@ public class OtherFragment extends Fragment implements IndexCallback {
     private SwipeRefreshLayout swipeRefreshLayout;
     private int offset = 0;
     private boolean firstInit = true;
+    public static final int VIEW_NOMOREVIEW = 999;
+    public static final int VIEW_LOAD = 888;
+    public static final int VIEW_FIRST = 777;
+    public static final int VIEW_FAIL = 666;
 
 
     public static OtherFragment newInstance(int position){
@@ -166,11 +170,11 @@ public class OtherFragment extends Fragment implements IndexCallback {
 
     @Override
     public void onIndexFail() {
-
+        itemRecyclerViewAdapter.setFooter(VIEW_FAIL);
     }
 
     @Override
     public void onIndexNothing() {
-
+        itemRecyclerViewAdapter.setFooter(VIEW_NOMOREVIEW);
     }
 }

@@ -51,6 +51,7 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
     public static final int VIEW_NOMOREVIEW = 999;
     public static final int VIEW_LOAD = 888;
     public static final int VIEW_FIRST = 777;
+    public static final int VIEW_FAIL = 666;
 
     @Nullable
     @Override
@@ -63,7 +64,6 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
         recyclerView.setHasFixedSize(true);
         itemRecyclerViewAdapter = new ItemRecyclerViewAdapter(getActivity());
         recyclerView.setAdapter(itemRecyclerViewAdapter);
-        loopView = new LoopView(getActivity());
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -132,15 +132,15 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
             itemCover.setContent_url(list.get(i).content_url);
             itemCoverList.add(itemCover);
         }
+        //itemRecyclerViewAdapter.setHeader(1);
         itemRecyclerViewAdapter.addItem(itemCoverList);
-        itemRecyclerViewAdapter.setFooter(VIEW_LOAD);
-        //loadView.startAnime();
+        //itemRecyclerViewAdapter.setFooter(VIEW_LOAD);
         firstInit = false;
     }
 
     @Override
     public void onIndexFail() {
-
+        itemRecyclerViewAdapter.setFooter(VIEW_FAIL);
     }
 
     @Override
@@ -150,6 +150,6 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
 
     @Override
     public void onIndexNothing() {
-
+        itemRecyclerViewAdapter.setFooter(VIEW_NOMOREVIEW);
     }
 }

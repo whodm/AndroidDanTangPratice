@@ -36,11 +36,13 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
     //headers
     private View header;
 
-    private LoopView loopView;
-    private NoMoreView noMoreView;
-    private LoadView loadView;
-    private FirstInitFailView firstInitFailView;
-    private ConectionFailView conectionFailView;
+//    private NoMoreView noMoreView;
+//    private LoadView loadView;
+//    private FirstInitFailView firstInitFailView;
+//    private ConectionFailView conectionFailView;
+
+    private View mHeader;
+    private View mFooter;
 
     private ItemViewHolder itemViewHolder;
 
@@ -52,6 +54,7 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
     public static final int VIEW_NOMOREVIEW = 999;
     public static final int VIEW_LOAD = 888;
     public static final int VIEW_FIRST = 777;
+    public static final int VIEW_FAIL = 666;
     public static final int TYPE_HEADER = 111;
     public static final int TYPE_FOOTER = 222;
     public static final int TYPE_ITEM = 333;
@@ -62,38 +65,33 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     public ItemRecyclerViewAdapter(Context context) {
         this.context = context;
-        noMoreView = new NoMoreView(context);
-        loadView = new LoadView(context);
-        firstInitFailView = new FirstInitFailView(context);
-        conectionFailView = new ConectionFailView(context);
+        mHeader = LayoutInflater.from(context).inflate(R.layout.layout_header, null);
+        mFooter = LayoutInflater.from(context).inflate(R.layout.layout_footer, null);
+//        noMoreView = new NoMoreView(context);
+//        loadView = new LoadView(context);
+//        firstInitFailView = new FirstInitFailView(context);
+//        conectionFailView = new ConectionFailView(context);
     }
 
     public View getHeader() {
         return header;
     }
 
-    public void setLoopView(LoopView loopView) {
-        this.loopView = loopView;
-    }
 
     public void setHeader(int i) {
-        if (i == VIEW_LOOPVIEW) {
-            header = loopView;
-        } else {
-            header = null;
-        }
-        notifyItemChanged(0);
+        header = mHeader;
+        notifyDataSetChanged();
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == TYPE_HEADER) {
             FrameLayout frameLayout = new FrameLayout(parent.getContext());
-            frameLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            frameLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             return new HeaderViewHolder(frameLayout);
         } else if (viewType == TYPE_FOOTER) {
             FrameLayout frameLayout = new FrameLayout(parent.getContext());
-            frameLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            frameLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             return new FooterViewHolder(frameLayout);
         } else {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_layout, parent, false);
@@ -175,16 +173,18 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     public void setFooter(int i) {
-        if (i == VIEW_LOAD) {
-            loadView.startAnime();
-            footer = loadView;
-        }
-        if (i == VIEW_NOMOREVIEW) {
-            footer = noMoreView;
-        }
-        if (i == VIEW_FIRST) {
-            footer = firstInitFailView;
-        }
+//        if (i == VIEW_LOAD) {
+//            loadView.startAnime();
+//            footer = loadView;
+//        }
+//        if (i == VIEW_NOMOREVIEW) {
+//            footer = noMoreView;
+//        }
+//        if (i == VIEW_FIRST) {
+//            footer = firstInitFailView;
+//        }
+        footer = mFooter;
+//        notifyItemChanged(getItemCount() - 1);
         notifyDataSetChanged();
 //        if (this.footer != null) {
 //            this.footer = footer;
@@ -234,7 +234,8 @@ public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
     public void addItem(List<ItemCover> list) {
         int size = getItemCount();
         items.addAll(list);
-        notifyItemRangeChanged(size - 1, list.size());
+//        notifyItemRangeInserted(size - 1,list.size());
+        notifyDataSetChanged();
     }
 
     public class FooterViewHolder extends RecyclerView.ViewHolder {
