@@ -11,6 +11,7 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.example.whodm.retrofitdemo.R;
 import com.example.whodm.retrofitdemo.callback.SingleCallback;
@@ -111,21 +112,20 @@ public class SingleFragment extends Fragment implements SingleCallback {
             itemCoverList.add(singleCover);
         }
         singleRecyclerViewAdapter.addItem(itemCoverList);
-        singleRecyclerViewAdapter.setFooter(loadView);
-
+        //singleRecyclerViewAdapter.setFooter(loadView);
     }
 
     @Override
     public void onSingleFail() {
-        //Toast.makeText(getContext(), "Index连接失败", Toast.LENGTH_LONG).show();
-        singleRecyclerViewAdapter.setFooter(conectionFailView);
-        singleRecyclerViewAdapter.setEndlessLoadListener(null);
+        Toast.makeText(getContext(), "Index连接失败", Toast.LENGTH_LONG).show();
+        //singleRecyclerViewAdapter.setFooter(conectionFailView);
+        //singleRecyclerViewAdapter.setEndlessLoadListener(null);
     }
 
     @Override
     public void onSingleNothing() {
-        //Toast.makeText(getContext(), "没有更多了", Toast.LENGTH_LONG).show();
-        singleRecyclerViewAdapter.setFooter(noMoreView);
-        singleRecyclerViewAdapter.setEndlessLoadListener(null);
+        Toast.makeText(getContext(), "没有更多了", Toast.LENGTH_LONG).show();
+        //singleRecyclerViewAdapter.setFooter(noMoreView);
+        //singleRecyclerViewAdapter.setEndlessLoadListener(null);
     }
 }

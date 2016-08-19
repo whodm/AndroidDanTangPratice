@@ -6,12 +6,13 @@ import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 /**
  * Created by whodm on 2016/8/14.
  */
-public class ConectionFailView extends LinearLayout {
+public class ConectionFailView extends RelativeLayout {
     private TextView tv_None;
 
     public ConectionFailView(Context context) {
@@ -28,16 +29,15 @@ public class ConectionFailView extends LinearLayout {
         tv_None = new TextView(context);
         tv_None.setText("连接失败");
         tv_None.setTextSize(18);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.gravity = Gravity.CENTER;
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT);
+        params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+        params.addRule(RelativeLayout.CENTER_VERTICAL);
 
         tv_None.setLayoutParams(params);
 
-        this.setOrientation(VERTICAL);
-
         this.addView(tv_None);
 
-        this.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        this.setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
     }
 }

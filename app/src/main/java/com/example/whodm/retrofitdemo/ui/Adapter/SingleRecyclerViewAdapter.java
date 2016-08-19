@@ -50,16 +50,6 @@ public class SingleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
         this.context = context;
     }
 
-//    public View getHeader() {
-//        return header;
-//    }
-//
-//    public void setHeader(View header) {
-//        this.header = null;
-//        this.header = header;
-//        notifyItemInserted(0);
-//    }
-
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (header != null && viewType == TYPE_HEADER) {

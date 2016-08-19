@@ -5,12 +5,13 @@ import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 /**
  * Created by whodm on 2016/8/14.
  */
-public class NoMoreView extends LinearLayout {
+public class NoMoreView extends RelativeLayout {
     private TextView tv_None;
 
     public NoMoreView(Context context) {
@@ -25,15 +26,14 @@ public class NoMoreView extends LinearLayout {
 
     public void init(Context context) {
         tv_None = new TextView(context);
-        tv_None.setText("已经没有东西啦!");
+        tv_None.setText("已经没有更多了啊");
         tv_None.setTextSize(18);
-        LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT,
+        LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT,
                 LayoutParams.WRAP_CONTENT);
-        params.gravity = Gravity.CENTER;
+        params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+        params.addRule(RelativeLayout.CENTER_VERTICAL);
 
         tv_None.setLayoutParams(params);
-
-        this.setOrientation(VERTICAL);
 
         this.addView(tv_None);
 

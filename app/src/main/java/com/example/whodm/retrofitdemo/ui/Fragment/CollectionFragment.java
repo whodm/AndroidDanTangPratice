@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import com.example.whodm.retrofitdemo.callback.BannerCallback;
 import com.example.whodm.retrofitdemo.R;
@@ -34,6 +35,8 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
     private static int COLLECTION = 4;
     private final static HttpService httpservice = new HttpService();
     private RecyclerView recyclerView;
+    private FrameLayout frameLayout;
+    private View firstLoadFail;
     private ItemRecyclerViewAdapter itemRecyclerViewAdapter;
     private final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
     private int offset = 0;
@@ -50,6 +53,8 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
         View view = inflater.inflate(R.layout.fragment_collection,container,false);
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler);
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refresh_collection);
+        frameLayout = (FrameLayout)view.findViewById(R.id.collection_container);
+        firstLoadFail = inflater.inflate(R.layout.frame_firstloadfail,container,false);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setHasFixedSize(true);
@@ -60,6 +65,7 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
             public void onRefresh() {
                 offset = 0;
                 itemRecyclerViewAdapter.clearItems();
+                frameLayout.removeView(firstLoadFail);
                 firstInit = true;
                 init();
                 swipeRefreshLayout.setRefreshing(false);
@@ -131,7 +137,8 @@ public class CollectionFragment extends Fragment implements BannerCallback, Inde
     @Override
     public void onIndexFail() {
         if (firstInit) {
-            itemRecyclerViewAdapter.setHeader(VIEW_FIRST);
+            frameLayout.addView(firstLoadFail);
+            //itemRecyclerViewAdapter.setHeader(VIEW_FIRST);
         } else {
             itemRecyclerViewAdapter.setFooter(VIEW_FAIL);
         }

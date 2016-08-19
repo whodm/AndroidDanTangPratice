@@ -12,6 +12,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.whodm.retrofitdemo.R;
@@ -37,7 +39,7 @@ public class OtherFragment extends Fragment implements IndexCallback {
     private static String TAG = "otherFragment";
     private static final String ARG_POSITION = "position";
     private RecyclerView recyclerView;
-    private ItemRecyclerViewAdapter itemRecyclerViewAdapter;
+    private FrameLayout frameLayout;
     private OtherItemRecyclerViewAdapter otherItemRecyclerViewAdapter;
     private final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
     private int position;
@@ -50,6 +52,7 @@ public class OtherFragment extends Fragment implements IndexCallback {
     private SwipeRefreshLayout swipeRefreshLayout;
     private int offset = 0;
     private boolean firstInit = true;
+    private View firstLoadFail;
     public static final int VIEW_NOMOREVIEW = 999;
     public static final int VIEW_LOAD = 888;
     public static final int VIEW_FIRST = 777;
@@ -77,9 +80,10 @@ public class OtherFragment extends Fragment implements IndexCallback {
         View view = inflater.inflate(R.layout.fragment_channel,container,false);
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_channel);
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refresh_channel);
+        frameLayout = (FrameLayout)view.findViewById(R.id.channel_container);
+        firstLoadFail = inflater.inflate(R.layout.frame_firstloadfail,container,false);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        //itemRecyclerViewAdapter = new ItemRecyclerViewAdapter(getActivity());
         otherItemRecyclerViewAdapter = new OtherItemRecyclerViewAdapter(getActivity());
         recyclerView.setAdapter(otherItemRecyclerViewAdapter);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -87,6 +91,7 @@ public class OtherFragment extends Fragment implements IndexCallback {
             public void onRefresh() {
                 offset = 0;
                 otherItemRecyclerViewAdapter.clearItem();
+                frameLayout.removeView(firstLoadFail);
                 firstInit = true;
                 init();
                 swipeRefreshLayout.setRefreshing(false);
@@ -176,7 +181,7 @@ public class OtherFragment extends Fragment implements IndexCallback {
     @Override
     public void onIndexFail() {
         if (firstInit) {
-            otherItemRecyclerViewAdapter.setFooterView(VIEW_FIRST);
+            frameLayout.addView(firstLoadFail);
         } else {
             otherItemRecyclerViewAdapter.setFooterView(VIEW_FAIL);
         }
