@@ -1,2 +1,2 @@
 # AndroidDanTangPratice
-A project for pratice
+A project for practice
